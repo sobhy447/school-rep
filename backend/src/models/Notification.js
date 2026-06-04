@@ -1,34 +1,34 @@
 const mongoose = require('mongoose');
 
-const notificationSchema = new mongoose.Schema({
+const NotificationSchema = new mongoose.Schema({
   recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'المستلم مطلوب']
+    required: true
   },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'المرسل مطلوب']
+    required: true
   },
   type: {
     type: String,
     enum: ['teacher_submitted', 'head_approved', 'head_edited', 'admin_unlocked'],
-    required: [true, 'نوع الإشعار مطلوب']
+    required: true
   },
   title: {
     type: String,
-    required: [true, 'عنوان الإشعار مطلوب']
+    required: true
   },
   message: {
     type: String,
-    required: [true, 'محتوى الإشعار مطلوب']
+    required: true
   },
   data: {
-    type: mongoose.Schema.Types.Mixed,
+    type: Object,
     default: {}
   },
-  read: {
+  isRead: {
     type: Boolean,
     default: false
   },
@@ -38,8 +38,4 @@ const notificationSchema = new mongoose.Schema({
   }
 });
 
-// Indexes
-notificationSchema.index({ recipient: 1, read: 1 });
-notificationSchema.index({ recipient: 1, createdAt: -1 });
-
-module.exports = mongoose.model('Notification', notificationSchema);
+module.exports = mongoose.model('Notification', NotificationSchema);

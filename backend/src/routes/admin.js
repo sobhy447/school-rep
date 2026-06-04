@@ -2,18 +2,13 @@ const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 const {
-  getAdminSettings,
-  updateAdminSettings,
-  getAllApprovals,
-  unlockApproval
+  getSettings,
+  updateSettings,
+  unlockGrades
 } = require('../controllers/adminSettingsController');
 
-// Settings routes
-router.get('/settings', protect, authorize('admin'), getAdminSettings);
-router.post('/settings', protect, authorize('admin'), updateAdminSettings);
-
-// Approval routes
-router.get('/approvals', protect, authorize('admin'), getAllApprovals);
-router.post('/unlock', protect, authorize('admin'), unlockApproval);
+router.get('/settings', protect, authorize('admin'), getSettings);
+router.put('/settings', protect, authorize('admin'), updateSettings);
+router.post('/unlock', protect, authorize('admin'), unlockGrades);
 
 module.exports = router;

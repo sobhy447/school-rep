@@ -1,61 +1,32 @@
 const mongoose = require('mongoose');
 
-const settingsSchema = new mongoose.Schema({
-  // Period settings
-  firstPeriodEnabled: {
-    type: Boolean,
-    default: true
+const SettingsSchema = new mongoose.Schema({
+  activePeriod: {
+    type: String,
+    enum: ['1', '2', 'both', 'none'],
+    default: '1'
   },
-  secondPeriodEnabled: {
-    type: Boolean,
-    default: true
+  activeColumns: {
+    classwork: {
+      type: Boolean,
+      default: true
+    },
+    exam: {
+      type: Boolean,
+      default: true
+    }
   },
-
-  // Column settings
-  workEnabled: {
-    type: Boolean,
-    default: true
-  },
-  examEnabled: {
-    type: Boolean,
-    default: true
-  },
-
-  // School info
   schoolName: {
     type: String,
-    default: 'مدرسة النموذجية'
+    default: 'School Name'
   },
-  ministryName: {
+  schoolLogo: {
     type: String,
-    default: 'وزارة التربية'
-  },
-  country: {
-    type: String,
-    default: 'دولة الكويت'
+    default: ''
   },
   academicYear: {
     type: String,
     default: '2025-2026'
-  },
-
-  // Grade limits
-  workMax: {
-    type: Number,
-    default: 40
-  },
-  examMax: {
-    type: Number,
-    default: 60
-  },
-  allowHalf: {
-    type: Boolean,
-    default: true
-  },
-
-  createdAt: {
-    type: Date,
-    default: Date.now
   },
   updatedAt: {
     type: Date,
@@ -63,9 +34,4 @@ const settingsSchema = new mongoose.Schema({
   }
 });
 
-settingsSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
-module.exports = mongoose.model('Settings', settingsSchema);
+module.exports = mongoose.model('Settings', SettingsSchema);

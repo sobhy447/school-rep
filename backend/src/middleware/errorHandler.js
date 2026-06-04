@@ -4,17 +4,18 @@ const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
 
-  console.error(err);
+  // Log to console for dev
+  console.log(err);
 
   // Mongoose bad ObjectId
   if (err.name === 'CastError') {
-    const message = 'المورد غير موجود';
+    const message = 'Resource not found';
     error = new ErrorResponse(message, 404);
   }
 
   // Mongoose duplicate key
   if (err.code === 11000) {
-    const message = 'هذا البيان موجود مسبقاً';
+    const message = 'Duplicate field value entered';
     error = new ErrorResponse(message, 400);
   }
 
@@ -24,21 +25,9 @@ const errorHandler = (err, req, res, next) => {
     error = new ErrorResponse(message, 400);
   }
 
-  // JWT errors
-  if (err.name === 'JsonWebTokenError') {
-    const message = 'توكن غير صالح';
-    error = new ErrorResponse(message, 401);
-  }
-
-  if (err.name === 'TokenExpiredError') {
-    const message = 'انتهت صلاحية التوكن';
-    error = new ErrorResponse(message, 401);
-  }
-
   res.status(error.statusCode || 500).json({
     success: false,
-    message: error.message || 'خطأ في الخادم',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    error: error.message || 'Server Error'
   });
 };
 

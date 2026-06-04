@@ -1,38 +1,34 @@
 const mongoose = require('mongoose');
 
-const excuseSchema = new mongoose.Schema({
+const ExcuseSchema = new mongoose.Schema({
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Student',
-    required: [true, 'الطالب مطلوب']
-  },
-  class: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Class',
-    required: [true, 'الفصل مطلوب']
+    required: true
   },
   subject: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Subject',
-    required: [true, 'المادة مطلوبة']
+    required: true
+  },
+  classId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Class',
+    required: true
   },
   period: {
     type: String,
-    enum: ['first', 'second'],
-    default: 'first'
+    enum: ['1', '2'],
+    required: true
   },
   type: {
     type: String,
-    enum: ['work', 'exam'],
-    required: [true, 'نوع العذر مطلوب (أعمال أو اختبار)']
+    enum: ['classwork', 'exam', 'both'],
+    required: true
   },
   reason: {
     type: String,
-    required: [true, 'سبب العذر مطلوب']
-  },
-  academicYear: {
-    type: Number,
-    default: () => new Date().getFullYear()
+    required: [true, 'Please add excuse reason']
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -45,8 +41,4 @@ const excuseSchema = new mongoose.Schema({
   }
 });
 
-// Indexes
-excuseSchema.index({ student: 1, class: 1, subject: 1, period: 1, type: 1, academicYear: 1 }, { unique: true });
-excuseSchema.index({ class: 1, subject: 1, period: 1, academicYear: 1 });
-
-module.exports = mongoose.model('Excuse', excuseSchema);
+module.exports = mongoose.model('Excuse', ExcuseSchema);

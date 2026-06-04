@@ -1,42 +1,30 @@
 const mongoose = require('mongoose');
 
-const studentSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'اسم الطالب مطلوب'],
-    trim: true
-  },
+const StudentSchema = new mongoose.Schema({
   studentId: {
     type: String,
-    required: [true, 'رقم الطالب مطلوب'],
+    required: [true, 'Please add student ID'],
     unique: true,
     trim: true
   },
-  class: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Class',
-    required: [true, 'الفصل مطلوب']
-  },
-  gradeLevel: {
-    type: Number,
-    required: [true, 'المرحلة الدراسية مطلوبة'],
-    enum: [6, 7, 8, 9]
-  },
-  dateOfBirth: {
-    type: Date
-  },
-  gender: {
+  name: {
     type: String,
-    enum: ['male', 'female']
-  },
-  parentPhone: {
-    type: String,
+    required: [true, 'Please add student name'],
     trim: true
   },
-  parentEmail: {
+  classId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Class',
+    required: true
+  },
+  grade: {
     type: String,
-    trim: true,
-    lowercase: true
+    enum: ['6', '7', '8', '9'],
+    required: true
+  },
+  section: {
+    type: String,
+    required: true
   },
   isActive: {
     type: Boolean,
@@ -48,9 +36,4 @@ const studentSchema = new mongoose.Schema({
   }
 });
 
-// Indexes
-studentSchema.index({ studentId: 1 });
-studentSchema.index({ class: 1 });
-studentSchema.index({ gradeLevel: 1 });
-
-module.exports = mongoose.model('Student', studentSchema);
+module.exports = mongoose.model('Student', StudentSchema);

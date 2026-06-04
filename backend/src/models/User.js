@@ -1,22 +1,30 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'الاسم مطلوب'],
-    trim: true
-  },
+const UserSchema = new mongoose.Schema({
   civilId: {
     type: String,
-    required: [true, 'الرقم المدني مطلوب'],
+    required: [true, 'Please add civil ID'],
     unique: true,
+    trim: true,
+    length: 6
+  },
+  name: {
+    type: String,
+    required: [true, 'Please add a name'],
     trim: true
+  },
+  email: {
+    type: String,
+    required: [true, 'Please add an email'],
+    unique: true,
+    match: [/\S+@\S+\.\S+/, 'Please add a valid email']
   },
   password: {
     type: String,
-    required: [true, 'كلمة المرور مطلوبة'],
-    minlength: [6, 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'],
+    required: [true, 'Please add a password'],
+    minlength: 6,
     select: false
   },
   role: {
@@ -24,25 +32,21 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'head', 'teacher', 'control'],
     default: 'teacher'
   },
-  subject: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Subject'
-  },
-  phone: {
+  department: {
     type: String,
     trim: true
   },
-  email: {
-    type: String,
-    trim: true,
-    lowercase: true
-  },
+  subjects: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Subject'
+  }],
+  classes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Class'
+  }],
   isActive: {
     type: Boolean,
     default: true
-  },
-  lastLogin: {
-    type: Date
   },
   createdAt: {
     type: Date,
@@ -50,20 +54,25 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// Encrypt password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
-  next();
+// Encrypt password using bcrypt
+UserSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+// Sign JWT and return
+UserSchema.methods.getSignedJwtToken = function() {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE || '30d'
+  });
 };
 
-// Indexes
-userSchema.index({ civilId: 1 });
-userSchema.index({ role: 1 });
+// Match user entered password to hashed password in database
+UserSchema.methods.matchPassword = async function(enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', UserSchema);
