@@ -11,7 +11,10 @@ class CostCenter extends Model
 {
     use BelongsToCompany, SoftDeletes;
 
-    protected $fillable = ['company_id', 'parent_id', 'code', 'name', 'name_en', 'is_active'];
+    protected $fillable = [
+        'company_id', 'parent_id', 'code', 'name', 'name_en', 'is_active',
+        'linked_account_id', 'client_name', 'counterparty_name',
+    ];
 
     protected function casts(): array
     {
@@ -21,5 +24,11 @@ class CostCenter extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(CostCenter::class, 'parent_id');
+    }
+
+    /** الحساب المرتبط بمركز التكلفة الإضافي (يُستدعى تلقائياً في سطر القيد). */
+    public function linkedAccount(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'linked_account_id');
     }
 }

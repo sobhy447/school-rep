@@ -102,6 +102,24 @@ class AccountController extends BaseCrudController
         return $this->ok(null, 'تم حذف الحساب');
     }
 
+    /** بحث ذكي عن الحسابات الورقية (F1 في شاشة القيد). */
+    public function search(Request $request): JsonResponse
+    {
+        $q = trim((string) $request->query('q', ''));
+        $items = Account::query()->withCount('children')
+            ->when($q !== '', fn ($query) => $query->where(function ($w) use ($q) {
+                $w->where('code', 'like', "%{$q}%")->orWhere('name', 'like', "%{$q}%");
+            }))
+            ->where('accepts_entries', true)
+            ->orderBy('code')->limit(20)->get()
+            ->filter(fn ($a) => $a->children_count === 0)
+            ->map(fn ($a) => ['id' => $a->id, 'code' => $a->code, 'name' => $a->name,
+                              'type' => $a->type, 'is_cash_or_bank' => $a->is_cash_or_bank])
+            ->values();
+
+        return $this->ok($items);
+    }
+
     /** الشجرة الكاملة مع الأرصدة المجمّعة. */
     public function tree(): JsonResponse
     {

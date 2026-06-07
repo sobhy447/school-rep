@@ -143,6 +143,24 @@ class DatabaseSeeder extends Seeder
                 Account::query()->withoutGlobalScopes()->whereKey($parentId)->update(['accepts_entries' => false]);
             }
         }
+
+        // تعليم حسابات النقدية/البنك (للتحقق في السندات)
+        Account::query()->withoutGlobalScopes()
+            ->where('company_id', $companyId)->whereIn('code', ['1101', '1102'])
+            ->update(['is_cash_or_bank' => true]);
+
+        // مركز تكلفة إضافي مربوط بحساب العملاء + اسم موكل/خصم (تدفّق مكاتب المحاماة)
+        if (isset($idByCode['1103'])) {
+            \App\Models\CostCenter::firstOrCreate(
+                ['company_id' => $companyId, 'code' => 'CASE-001'],
+                [
+                    'name' => 'قضية 001',
+                    'linked_account_id' => $idByCode['1103'],
+                    'client_name' => 'موكل تجريبي',
+                    'counterparty_name' => 'خصم تجريبي',
+                ]
+            );
+        }
     }
 
     /** بيانات إعدادات تجريبية لكل شركة. */

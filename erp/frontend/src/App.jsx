@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import api from './api.js'
 import Settings from './Settings.jsx'
 import Accounts from './Accounts.jsx'
+import JournalEntry from './JournalEntry.jsx'
+import Vouchers from './Vouchers.jsx'
 
 // المرحلة 0: شاشة دخول + عرض المستخدم الحالي (إثبات الأساس يعمل).
 const T = {
@@ -77,19 +79,19 @@ export default function App() {
       </div>
       {user && (
         <>
-          <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', gap: 8 }}>
-            <button onClick={() => setSection('settings')}
-              style={{ padding: '6px 14px', border: 0, borderRadius: 6, cursor: 'pointer',
-                       background: section === 'settings' ? '#1d4ed8' : '#e5e7eb', color: section === 'settings' ? '#fff' : '#111' }}>
-              الإعدادات
-            </button>
-            <button onClick={() => setSection('accounts')}
-              style={{ padding: '6px 14px', border: 0, borderRadius: 6, cursor: 'pointer',
-                       background: section === 'accounts' ? '#1d4ed8' : '#e5e7eb', color: section === 'accounts' ? '#fff' : '#111' }}>
-              دليل الحسابات
-            </button>
+          <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {[['settings', 'الإعدادات'], ['accounts', 'دليل الحسابات'], ['journal', 'قيد يومية'], ['vouchers', 'السندات']].map(([k, label]) => (
+              <button key={k} onClick={() => setSection(k)}
+                style={{ padding: '6px 14px', border: 0, borderRadius: 6, cursor: 'pointer',
+                         background: section === k ? '#1d4ed8' : '#e5e7eb', color: section === k ? '#fff' : '#111' }}>
+                {label}
+              </button>
+            ))}
           </div>
-          {section === 'settings' ? <Settings /> : <Accounts />}
+          {section === 'settings' && <Settings />}
+          {section === 'accounts' && <Accounts />}
+          {section === 'journal' && <JournalEntry />}
+          {section === 'vouchers' && <Vouchers />}
         </>
       )}
     </div>
