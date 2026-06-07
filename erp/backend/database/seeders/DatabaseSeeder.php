@@ -39,6 +39,8 @@ class DatabaseSeeder extends Seeder
             'petty_cash' => ['العهد', 'Petty Cash'],
             'settlements' => ['الأمانات والسداد', 'Trust & Settlements'],
             'reports' => ['التقارير', 'Reports'],
+            'fixed_assets' => ['الأصول الثابتة', 'Fixed Assets'],
+            'banks' => ['البنوك والتسويات', 'Banks & Reconciliation'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {
@@ -121,6 +123,8 @@ class DatabaseSeeder extends Seeder
             ['1103', 'العملاء', 'ASSET', '11'],
             ['1104', 'عهد الموظفين', 'ASSET', '11'],
             ['12', 'الأصول الثابتة', 'ASSET', '1'],
+            ['1201', 'سيارات', 'ASSET', '12'],
+            ['1202', 'مجمع إهلاك السيارات', 'ASSET', '12'],
             ['2', 'الخصوم', 'LIABILITY', null],
             ['21', 'الموردون', 'LIABILITY', '2'],
             ['3', 'حقوق الملكية', 'EQUITY', null],
@@ -129,8 +133,10 @@ class DatabaseSeeder extends Seeder
             ['39', 'حساب النتيجة', 'EQUITY', '3'],
             ['4', 'الإيرادات', 'REVENUE', null],
             ['41', 'إيرادات الأتعاب', 'REVENUE', '4'],
+            ['42', 'أرباح/خسائر بيع أصول', 'REVENUE', '4'],
             ['5', 'المصروفات', 'EXPENSE', null],
             ['51', 'مصروفات إدارية', 'EXPENSE', '5'],
+            ['52', 'مصروف الإهلاك', 'EXPENSE', '5'],
         ];
 
         $idByCode = [];

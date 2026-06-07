@@ -8,6 +8,8 @@ import PettyCash from './PettyCash.jsx'
 import Settlement from './Settlement.jsx'
 import Reports from './Reports.jsx'
 import Dashboard from './Dashboard.jsx'
+import FixedAssets from './FixedAssets.jsx'
+import Banks from './Banks.jsx'
 
 // مجموعات قائمة التنقّل
 const NAV = [
@@ -20,13 +22,16 @@ const NAV = [
   { group: 'العمليات', items: [
     ['pettycash', 'العهد', '💼'],
     ['settlement', 'الأمانات والسداد', '🔴'],
+    ['assets', 'الأصول الثابتة', '🏗️'],
+    ['banks', 'البنوك والتسويات', '🏦'],
   ] },
   { group: 'التقارير', items: [['reports', 'التقارير', '📑']] },
   { group: 'النظام', items: [['settings', 'الإعدادات', '⚙️']] },
 ]
 
 const SCREENS = { dashboard: Dashboard, accounts: Accounts, journal: JournalEntry,
-  vouchers: Vouchers, pettycash: PettyCash, settlement: Settlement, reports: Reports, settings: Settings }
+  vouchers: Vouchers, pettycash: PettyCash, settlement: Settlement, reports: Reports,
+  settings: Settings, assets: FixedAssets, banks: Banks }
 
 const TITLES = Object.fromEntries(NAV.flatMap((g) => g.items.map(([k, label]) => [k, label])))
 

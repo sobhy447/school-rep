@@ -10,6 +10,8 @@ use App\Http\Controllers\Accounting\ExpenseClaimController;
 use App\Http\Controllers\Accounting\SettlementController;
 use App\Http\Controllers\Accounting\ClosingController;
 use App\Http\Controllers\Accounting\ReportController;
+use App\Http\Controllers\Accounting\FixedAssetController;
+use App\Http\Controllers\Accounting\BankReconciliationController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -131,4 +133,22 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
         Route::get('reports/claims', [ReportController::class, 'claims']);
         Route::get('reports/dashboard', [ReportController::class, 'dashboard']);
     });
+
+    // ===== المرحلة 6: الأصول الثابتة والإهلاك =====
+    Route::get('fixed-assets', [FixedAssetController::class, 'index'])->middleware('permission:fixed_assets.view');
+    Route::get('fixed-assets/{id}', [FixedAssetController::class, 'show'])->middleware('permission:fixed_assets.view');
+    Route::get('fixed-assets/{id}/schedule', [FixedAssetController::class, 'schedule'])->middleware('permission:fixed_assets.view');
+    Route::post('fixed-assets', [FixedAssetController::class, 'store'])->middleware('permission:fixed_assets.create');
+    Route::put('fixed-assets/{id}', [FixedAssetController::class, 'update'])->middleware('permission:fixed_assets.edit');
+    Route::delete('fixed-assets/{id}', [FixedAssetController::class, 'destroy'])->middleware('permission:fixed_assets.delete');
+    Route::post('fixed-assets/{id}/depreciate', [FixedAssetController::class, 'depreciate'])->middleware('permission:fixed_assets.post');
+    Route::post('fixed-assets/depreciate-all', [FixedAssetController::class, 'depreciateAll'])->middleware('permission:fixed_assets.post');
+    Route::post('fixed-assets/{id}/dispose', [FixedAssetController::class, 'dispose'])->middleware('permission:fixed_assets.post');
+
+    // ===== المرحلة 7: التسويات البنكية =====
+    Route::get('bank-reconciliations', [BankReconciliationController::class, 'index'])->middleware('permission:banks.view');
+    Route::get('bank-reconciliations/{id}', [BankReconciliationController::class, 'show'])->middleware('permission:banks.view');
+    Route::post('bank-reconciliations', [BankReconciliationController::class, 'store'])->middleware('permission:banks.create');
+    Route::post('bank-reconciliations/{id}/toggle', [BankReconciliationController::class, 'toggle'])->middleware('permission:banks.edit');
+    Route::post('bank-reconciliations/{id}/complete', [BankReconciliationController::class, 'complete'])->middleware('permission:banks.edit');
 });
