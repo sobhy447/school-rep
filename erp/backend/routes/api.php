@@ -25,6 +25,7 @@ use App\Http\Controllers\Accounting\AttachmentController;
 use App\Http\Controllers\Accounting\ReminderController;
 use App\Http\Controllers\Accounting\DocumentPdfController;
 use App\Http\Controllers\Accounting\AuditLogController;
+use App\Http\Controllers\Accounting\ChequeController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -144,6 +145,7 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
         Route::get('reports/general-ledger/{accountId}', [ReportController::class, 'generalLedger']);
         Route::get('reports/cash-flow', [ReportController::class, 'cashFlow']);
         Route::get('reports/claims', [ReportController::class, 'claims']);
+        Route::get('reports/aging', [ReportController::class, 'aging']);
         Route::get('reports/vat', [ReportController::class, 'vat']);
         Route::get('reports/dashboard', [ReportController::class, 'dashboard']);
     });
@@ -245,4 +247,10 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
 
     // ===== المرحلة 14: سجل التدقيق =====
     Route::get('audit-logs', [AuditLogController::class, 'index'])->middleware('permission:audit.view');
+
+    // ===== المرحلة 15: الشيكات =====
+    Route::get('cheques', [ChequeController::class, 'index'])->middleware('permission:cheques.view');
+    Route::post('cheques', [ChequeController::class, 'store'])->middleware('permission:cheques.create');
+    Route::post('cheques/{id}/clear', [ChequeController::class, 'clear'])->middleware('permission:cheques.edit');
+    Route::post('cheques/{id}/bounce', [ChequeController::class, 'bounce'])->middleware('permission:cheques.edit');
 });

@@ -60,6 +60,11 @@ class ReportController extends Controller
         return $this->ok($this->service->claimsReport($detailed, $from, $to));
     }
 
+    public function aging(Request $r): JsonResponse
+    {
+        return $this->ok($this->service->aging($r->query('type', 'CUSTOMER'), $r->query('as_of')));
+    }
+
     public function vat(Request $r): JsonResponse
     {
         [$from, $to] = $this->range($r);

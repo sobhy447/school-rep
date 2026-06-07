@@ -17,6 +17,7 @@ class CompanySettingController extends Controller
         'petty_cash_account_id', 'income_summary_account_id', 'retained_earnings_account_id',
         'vat_input_account_id', 'vat_output_account_id',
         'salary_expense_account_id', 'salaries_payable_account_id', 'deductions_payable_account_id',
+        'cheques_collection_account_id', 'cheques_payable_account_id',
     ];
 
     public function index(): JsonResponse

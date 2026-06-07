@@ -287,6 +287,43 @@ class ReportService
         ];
     }
 
+    /**
+     * أعمار الديون: لكل طرف (عميل/مورد) توزيع الرصيد القائم على فئات عمرية حسب تاريخ الحركة.
+     */
+    public function aging(string $partyType = 'CUSTOMER', ?string $asOf = null): array
+    {
+        $companyId = TenantContext::id();
+        $asOf = $asOf ? \Illuminate\Support\Carbon::parse($asOf) : \Illuminate\Support\Carbon::today();
+
+        $accounts = Account::query()->where('company_id', $companyId)->where('party_type', $partyType)->get();
+        $rows = [];
+        $totals = ['current' => 0.0, 'd30' => 0.0, 'd60' => 0.0, 'd90' => 0.0, 'older' => 0.0, 'total' => 0.0];
+
+        foreach ($accounts as $acc) {
+            $lines = JournalLine::query()->where('company_id', $companyId)->where('account_id', $acc->id)
+                ->whereHas('journalEntry', fn ($q) => $q->where('status', 'POSTED')->whereDate('entry_date', '<=', $asOf->toDateString()))
+                ->with('journalEntry:id,entry_date')->get();
+
+            $b = ['current' => 0.0, 'd30' => 0.0, 'd60' => 0.0, 'd90' => 0.0, 'older' => 0.0];
+            foreach ($lines as $l) {
+                $amount = AccountType::signedBalance($acc->type, (float) $l->debit, (float) $l->credit);
+                $days = optional($l->journalEntry?->entry_date)->diffInDays($asOf, false) ?? 0;
+                $bucket = $days <= 30 ? 'current' : ($days <= 60 ? 'd30' : ($days <= 90 ? 'd60' : ($days <= 120 ? 'd90' : 'older')));
+                $b[$bucket] += $amount;
+            }
+            $total = round(array_sum($b), 3);
+            if (abs($total) < 0.0005) {
+                continue;
+            }
+            foreach ($b as $k => $v) { $b[$k] = round($v, 3); $totals[$k] += $v; }
+            $totals['total'] += $total;
+            $rows[] = ['account_id' => $acc->id, 'code' => $acc->code, 'name' => $acc->name] + $b + ['total' => $total];
+        }
+        foreach ($totals as $k => $v) { $totals[$k] = round($v, 3); }
+
+        return ['party_type' => $partyType, 'as_of' => $asOf->toDateString(), 'rows' => $rows, 'totals' => $totals];
+    }
+
     /** لوحة المؤشرات. */
     public function dashboard(): array
     {

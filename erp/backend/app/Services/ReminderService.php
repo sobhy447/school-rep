@@ -30,6 +30,16 @@ class ReminderService
             }
         }
 
+        // شيكات مستحقة خلال 14 يوماً وما زالت منتظرة
+        foreach (\App\Models\Cheque::query()->where('company_id', $companyId)->where('status', 'PENDING')->get() as $chq) {
+            $daysLeft = Carbon::today()->diffInDays($chq->due_date, false);
+            if ($daysLeft >= 0 && $daysLeft <= 14) {
+                $kind = $chq->type === 'INCOMING' ? 'تحصيل' : 'صرف';
+                $created += $this->upsert($companyId, 'CHEQUE', 'CHEQUE', $chq->id,
+                    "شيك ({$kind}) رقم {$chq->cheque_number} يستحق قريباً", $chq->due_date->toDateString());
+            }
+        }
+
         // 2) سنوات مالية تنتهي خلال 30 يوماً وما زالت مفتوحة
         foreach (FiscalYear::query()->where('company_id', $companyId)->where('status', 'OPEN')->get() as $fy) {
             $daysLeft = Carbon::today()->diffInDays($fy->end_date, false);

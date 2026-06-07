@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
             'pos' => ['نقاط البيع', 'Point of Sale'],
             'reminders' => ['التذكيرات', 'Reminders'],
             'audit' => ['سجل التدقيق', 'Audit Log'],
+            'cheques' => ['الشيكات', 'Cheques'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {
@@ -131,6 +132,7 @@ class DatabaseSeeder extends Seeder
             ['1104', 'عهد الموظفين', 'ASSET', '11'],
             ['1105', 'المخزون', 'ASSET', '11'],
             ['1106', 'ضريبة المدخلات', 'ASSET', '11'],
+            ['1107', 'شيكات تحت التحصيل', 'ASSET', '11'],
             ['12', 'الأصول الثابتة', 'ASSET', '1'],
             ['1201', 'سيارات', 'ASSET', '12'],
             ['1202', 'مجمع إهلاك السيارات', 'ASSET', '12'],
@@ -139,6 +141,7 @@ class DatabaseSeeder extends Seeder
             ['22', 'ضريبة المخرجات المستحقة', 'LIABILITY', '2'],
             ['23', 'الرواتب المستحقة', 'LIABILITY', '2'],
             ['24', 'الاستقطاعات المستحقة', 'LIABILITY', '2'],
+            ['27', 'شيكات الدفع', 'LIABILITY', '2'],
             ['3', 'حقوق الملكية', 'EQUITY', null],
             ['31', 'رأس المال', 'EQUITY', '3'],
             ['32', 'الأرباح المحتجزة', 'EQUITY', '3'],
@@ -202,6 +205,8 @@ class DatabaseSeeder extends Seeder
         \App\Models\CompanySetting::put($companyId, 'salary_expense_account_id', (string) ($idByCode['54'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'salaries_payable_account_id', (string) ($idByCode['23'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'deductions_payable_account_id', (string) ($idByCode['24'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'cheques_collection_account_id', (string) ($idByCode['1107'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'cheques_payable_account_id', (string) ($idByCode['27'] ?? ''));
 
         // موظفون تجريبيون + مكوّن بدل/استقطاع
         $allow = \App\Models\SalaryComponent::firstOrCreate(['company_id' => $companyId, 'code' => 'HOUSING'], ['name' => 'بدل سكن', 'type' => 'EARNING', 'default_amount' => 100]);

@@ -7,6 +7,7 @@ const TABS = [
   ['balance-sheet', 'الميزانية العمومية'],
   ['cash-flow', 'التدفقات النقدية'],
   ['claims', 'تقرير الدعاوى'],
+  ['aging', 'أعمار الديون'],
   ['vat', 'ضريبة القيمة المضافة'],
 ]
 
@@ -29,7 +30,7 @@ export default function Reports() {
   const load = async () => {
     setErr(null); setData(null)
     try {
-      const url = tab === 'claims' ? `/reports/claims?mode=${claimsMode}` : `/reports/${tab}`
+      const url = tab === 'claims' ? `/reports/claims?mode=${claimsMode}` : (tab === 'aging' ? '/reports/aging?type=CUSTOMER' : `/reports/${tab}`)
       const r = await api.get(url); setData(r.data.data)
     } catch (e) { setErr(e.response?.data?.message || 'تعذّر التحميل') }
   }
@@ -49,10 +50,20 @@ export default function Reports() {
         {data && tab === 'balance-sheet' && <BalanceSheet d={data} />}
         {data && tab === 'cash-flow' && <CashFlow d={data} />}
         {data && tab === 'claims' && <Claims d={data} mode={claimsMode} setMode={setClaimsMode} />}
+        {data && tab === 'aging' && <Aging d={data} />}
         {data && tab === 'vat' && <Vat d={data} />}
         {!data && !err && <p className="muted">جارٍ التحميل…</p>}
       </div>
     </div>
+  )
+}
+
+function Aging({ d }) {
+  const t = d.totals
+  return (
+    <Table head={['الطرف', 'حالي (0-30)', '31-60', '61-90', '91-120', 'أقدم', 'الإجمالي']}
+      rows={d.rows.map((r) => [r.name, n(r.current), n(r.d30), n(r.d60), n(r.d90), n(r.older), n(r.total)])}
+      foot={['الإجمالي', n(t.current), n(t.d30), n(t.d60), n(t.d90), n(t.older), n(t.total)]} />
   )
 }
 
