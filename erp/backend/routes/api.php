@@ -20,6 +20,7 @@ use App\Http\Controllers\Accounting\SalesInvoiceController;
 use App\Http\Controllers\Accounting\EmployeeController;
 use App\Http\Controllers\Accounting\SalaryComponentController;
 use App\Http\Controllers\Accounting\PayrollController;
+use App\Http\Controllers\Accounting\PosController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -209,4 +210,9 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::get('payroll/{id}', [PayrollController::class, 'show'])->middleware('permission:hr.view');
     Route::post('payroll/generate', [PayrollController::class, 'generate'])->middleware('permission:hr.create');
     Route::post('payroll/{id}/post', [PayrollController::class, 'post'])->middleware('permission:hr.post');
+
+    // ===== المرحلة 11: نقاط البيع (POS) =====
+    Route::get('pos', [PosController::class, 'index'])->middleware('permission:pos.view');
+    Route::get('pos/{id}', [PosController::class, 'show'])->middleware('permission:pos.view');
+    Route::post('pos/checkout', [PosController::class, 'checkout'])->middleware('permission:pos.create');
 });

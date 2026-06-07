@@ -45,6 +45,7 @@ class DatabaseSeeder extends Seeder
             'purchases' => ['المشتريات', 'Purchases'],
             'sales' => ['المبيعات', 'Sales'],
             'hr' => ['الموارد البشرية', 'HR & Payroll'],
+            'pos' => ['نقاط البيع', 'Point of Sale'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {
