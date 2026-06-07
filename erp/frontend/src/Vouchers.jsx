@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import api from './api.js'
+import api, { openPdf } from './api.js'
 import AttachmentsModal from './AttachmentsModal.jsx'
 
 const emptyLine = () => ({ account_id: '', amount: '', cost_center_id: '', cost_center_extra_id: '' })
@@ -96,7 +96,7 @@ export default function Vouchers() {
           <thead><tr><th>الرقم</th><th>النوع</th><th>التاريخ</th><th>الطرف</th><th>المبلغ</th><th>الحالة</th><th>مرفقات</th></tr></thead>
           <tbody>
             {list.map((v) => (
-              <tr key={v.id}><td>{v.entry_number}</td><td>{typeAr(v.type)}</td><td>{String(v.entry_date).slice(0, 10)}</td><td>{v.party_name}</td><td>{n(v.total_debit)}</td><td><span className="badge badge-green">مرحّل</span></td><td><button className="btn btn-sm" onClick={() => setAttachEntry(v.id)}>📎</button></td></tr>
+              <tr key={v.id}><td>{v.entry_number}</td><td>{typeAr(v.type)}</td><td>{String(v.entry_date).slice(0, 10)}</td><td>{v.party_name}</td><td>{n(v.total_debit)}</td><td><span className="badge badge-green">مرحّل</span></td><td><button className="btn btn-sm" onClick={() => setAttachEntry(v.id)}>📎</button>{' '}<button className="btn btn-sm" onClick={() => openPdf(`/journal-entries/${v.id}/pdf`)}>🖨</button></td></tr>
             ))}
             {list.length === 0 && <tr><td colSpan={7} className="muted">لا توجد سندات</td></tr>}
           </tbody>

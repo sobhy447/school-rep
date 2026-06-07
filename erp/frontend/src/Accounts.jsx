@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import api from './api.js'
+import api, { openPdf } from './api.js'
 
 const TYPES = [
   { v: 'ASSET', ar: 'أصول' }, { v: 'LIABILITY', ar: 'خصوم' }, { v: 'EQUITY', ar: 'حقوق ملكية' },
@@ -21,6 +21,7 @@ function Node({ node, depth }) {
         <td>{node.normal_balance === 'DEBIT' ? 'مدين' : 'دائن'}</td>
         <td>{node.statement === 'BALANCE_SHEET' ? 'الميزانية' : 'قائمة الدخل'}</td>
         <td style={{ textAlign: 'end', fontWeight: 600 }}>{n(node.balance)}</td>
+        <td>{node.is_leaf && <button className="btn btn-sm" onClick={() => openPdf(`/accounts/${node.id}/statement/pdf?with_attachments=1`)}>🖨 كشف</button>}</td>
       </tr>
       {node.children?.map((c) => <Node key={c.id} node={c} depth={depth + 1} />)}
     </>
@@ -75,10 +76,10 @@ export default function Accounts() {
 
       <div className="card">
         <table>
-          <thead><tr><th>الحساب</th><th>النوع</th><th>الطبيعة</th><th>يظهر في</th><th style={{ textAlign: 'end' }}>الرصيد</th></tr></thead>
+          <thead><tr><th>الحساب</th><th>النوع</th><th>الطبيعة</th><th>يظهر في</th><th style={{ textAlign: 'end' }}>الرصيد</th><th>كشف</th></tr></thead>
           <tbody>
             {tree.map((nd) => <Node key={nd.id} node={nd} depth={0} />)}
-            {tree.length === 0 && <tr><td colSpan={5} className="muted">لا توجد حسابات</td></tr>}
+            {tree.length === 0 && <tr><td colSpan={6} className="muted">لا توجد حسابات</td></tr>}
           </tbody>
         </table>
       </div>

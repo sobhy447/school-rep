@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import api from './api.js'
+import api, { openPdf } from './api.js'
 
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
 const today = () => new Date().toISOString().slice(0, 10)
@@ -98,7 +98,10 @@ function InvoiceManager({ kind }) {
               <tr key={v.id}>
                 <td>{v.invoice_number}</td><td>{String(v.invoice_date).slice(0, 10)}</td><td>{n(v.total)}</td>
                 <td><span className={`badge ${v.status === 'POSTED' ? 'badge-green' : 'badge-gray'}`}>{v.status === 'POSTED' ? 'مرحّلة' : 'مسودة'}</span></td>
-                <td>{v.status === 'DRAFT' && <button className="btn-primary btn-sm" onClick={() => post(v.id)}>ترحيل</button>}</td>
+                <td>
+                  {v.status === 'DRAFT' && <button className="btn-primary btn-sm" onClick={() => post(v.id)}>ترحيل</button>}{' '}
+                  <button className="btn btn-sm" onClick={() => openPdf(`/${c.ep}/${v.id}/pdf`)}>🖨 PDF</button>
+                </td>
               </tr>
             ))}
             {list.length === 0 && <tr><td colSpan={5} className="muted">لا توجد فواتير</td></tr>}

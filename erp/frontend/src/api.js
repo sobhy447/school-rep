@@ -19,4 +19,11 @@ api.interceptors.response.use(
   }
 )
 
+// يفتح ملف PDF محمي (يضيف التوكن ثم يفتحه في تبويب جديد)
+export async function openPdf(path) {
+  const res = await api.get(path, { responseType: 'blob' })
+  const url = URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }))
+  window.open(url, '_blank')
+}
+
 export default api

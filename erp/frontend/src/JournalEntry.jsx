@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import api from './api.js'
+import api, { openPdf } from './api.js'
 import AttachmentsModal from './AttachmentsModal.jsx'
 
 const emptyLine = () => ({ account_id: '', debit: '', credit: '', cost_center_id: '', cost_center_extra_id: '', reference_number: '', description: '', counterparty_name: '' })
@@ -110,7 +110,8 @@ export default function JournalEntry() {
                   {e.status === 'DRAFT' && <button className="btn-primary btn-sm" onClick={() => action(e.id, 'approve')}>اعتماد</button>}
                   {e.status === 'APPROVED' && <button className="btn-primary btn-sm" onClick={() => action(e.id, 'post')}>ترحيل</button>}
                   {e.status === 'POSTED' && <button className="btn btn-sm" onClick={() => action(e.id, 'reverse')}>عكس</button>}
-                  <button className="btn btn-sm" onClick={() => setAttachEntry(e.id)}>📎</button>
+                  <button className="btn btn-sm" onClick={() => setAttachEntry(e.id)}>📎</button>{' '}
+                  <button className="btn btn-sm" onClick={() => openPdf(`/journal-entries/${e.id}/pdf`)}>🖨</button>
                 </td>
               </tr>
             ))}

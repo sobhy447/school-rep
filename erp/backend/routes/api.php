@@ -23,6 +23,7 @@ use App\Http\Controllers\Accounting\PayrollController;
 use App\Http\Controllers\Accounting\PosController;
 use App\Http\Controllers\Accounting\AttachmentController;
 use App\Http\Controllers\Accounting\ReminderController;
+use App\Http\Controllers\Accounting\DocumentPdfController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -234,4 +235,10 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::post('reminders/{id}/done', [ReminderController::class, 'markDone'])->middleware('permission:reminders.edit');
     Route::post('reminders/{id}/dismiss', [ReminderController::class, 'dismiss'])->middleware('permission:reminders.edit');
     Route::delete('reminders/{id}', [ReminderController::class, 'destroy'])->middleware('permission:reminders.delete');
+
+    // ===== الطباعة / PDF =====
+    Route::get('sales-invoices/{id}/pdf', [DocumentPdfController::class, 'salesInvoice'])->middleware('permission:sales.view');
+    Route::get('purchase-invoices/{id}/pdf', [DocumentPdfController::class, 'purchaseInvoice'])->middleware('permission:purchases.view');
+    Route::get('journal-entries/{id}/pdf', [DocumentPdfController::class, 'journalEntry'])->middleware('permission:journals.view');
+    Route::get('accounts/{id}/statement/pdf', [DocumentPdfController::class, 'statement'])->middleware('permission:accounts.view');
 });
