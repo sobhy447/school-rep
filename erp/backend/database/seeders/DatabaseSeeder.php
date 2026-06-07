@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Account;
+use App\Models\AccountCategory;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\CostCenter;
@@ -92,6 +94,55 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->seedSettings($company->id);
+        $this->seedAccounting($company->id);
+    }
+
+    /** فئات الحسابات + شجرة حسابات نموذجية لكل شركة. */
+    private function seedAccounting(int $companyId): void
+    {
+        // فئات (تعدد المجموعات): نوع العميل + التابع له
+        foreach ([
+            ['customer_type', 'VIP', 'عميل مميّز'],
+            ['customer_type', 'NORMAL', 'عميل عادي'],
+            ['affiliation', 'BRANCH_A', 'تابع للفرع أ'],
+        ] as [$group, $code, $name]) {
+            AccountCategory::firstOrCreate(
+                ['company_id' => $companyId, 'group' => $group, 'code' => $code],
+                ['name' => $name, 'applies_to_type' => 'ASSET']
+            );
+        }
+
+        // شجرة حسابات نموذجية: [code, name, type, parent_code]
+        $chart = [
+            ['1', 'الأصول', 'ASSET', null],
+            ['11', 'الأصول المتداولة', 'ASSET', '1'],
+            ['1101', 'الصندوق', 'ASSET', '11'],
+            ['1102', 'البنك', 'ASSET', '11'],
+            ['1103', 'العملاء', 'ASSET', '11'],
+            ['12', 'الأصول الثابتة', 'ASSET', '1'],
+            ['2', 'الخصوم', 'LIABILITY', null],
+            ['21', 'الموردون', 'LIABILITY', '2'],
+            ['3', 'حقوق الملكية', 'EQUITY', null],
+            ['31', 'رأس المال', 'EQUITY', '3'],
+            ['4', 'الإيرادات', 'REVENUE', null],
+            ['41', 'إيرادات الأتعاب', 'REVENUE', '4'],
+            ['5', 'المصروفات', 'EXPENSE', null],
+            ['51', 'مصروفات إدارية', 'EXPENSE', '5'],
+        ];
+
+        $idByCode = [];
+        foreach ($chart as [$code, $name, $type, $parentCode]) {
+            $parentId = $parentCode ? ($idByCode[$parentCode] ?? null) : null;
+            $acc = Account::firstOrCreate(
+                ['company_id' => $companyId, 'code' => $code],
+                ['name' => $name, 'type' => $type, 'parent_id' => $parentId]
+            );
+            $idByCode[$code] = $acc->id;
+            // الأب يصبح تصنيفاً (لا يقبل حركة)
+            if ($parentId) {
+                Account::query()->withoutGlobalScopes()->whereKey($parentId)->update(['accepts_entries' => false]);
+            }
+        }
     }
 
     /** بيانات إعدادات تجريبية لكل شركة. */

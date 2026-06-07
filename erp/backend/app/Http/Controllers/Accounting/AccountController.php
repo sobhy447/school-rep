@@ -1,0 +1,140 @@
+<?php
+
+namespace App\Http\Controllers\Accounting;
+
+use App\Http\Controllers\Settings\BaseCrudController;
+use App\Models\Account;
+use App\Services\AccountService;
+use App\Support\AccountType;
+use App\Support\TenantContext;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class AccountController extends BaseCrudController
+{
+    protected string $modelClass = Account::class;
+    protected string $orderBy = 'code';
+
+    public function __construct(private AccountService $service) {}
+
+    protected function rules(Request $request, ?int $id = null): array
+    {
+        return [
+            'code' => ['required', 'string', 'max:50',
+                Rule::unique('accounts', 'code')->where('company_id', TenantContext::id())->ignore($id)],
+            'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['nullable', 'string', 'max:255'],
+            'type' => ['required', Rule::in(AccountType::ALL)],
+            'parent_id' => ['nullable',
+                Rule::exists('accounts', 'id')->where('company_id', TenantContext::id())],
+            'opening_balance' => ['sometimes', 'numeric'],
+            'opening_balance_type' => ['sometimes', Rule::in(['DEBIT', 'CREDIT'])],
+            'currency_code' => ['nullable', 'string', 'size:3'],
+            'cost_center_id' => ['nullable',
+                Rule::exists('cost_centers', 'id')->where('company_id', TenantContext::id())],
+            'tax_rate_id' => ['nullable',
+                Rule::exists('tax_rates', 'id')->where('company_id', TenantContext::id())],
+            'cost_center_required' => ['boolean'],
+            'meta' => ['nullable', 'array'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => [Rule::exists('account_categories', 'id')->where('company_id', TenantContext::id())],
+            'is_active' => ['boolean'],
+        ];
+    }
+
+    public function index(): JsonResponse
+    {
+        $items = Account::query()->withCount('children')->with('categories:id,group,code,name')
+            ->orderBy('code')->get();
+
+        return $this->ok($items);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        $item = Account::query()->withCount('children')->with('categories')->findOrFail($id);
+        $item->setAttribute('balance', $this->service->balanceOf($item));
+
+        return $this->ok($item);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate($this->rules($request));
+        $this->service->assertTypeMatchesParent($data['type'], $data['parent_id'] ?? null);
+
+        $account = Account::query()->create($data);
+        $this->service->refreshParentPostable($account->parent_id);
+        if ($request->has('category_ids')) {
+            $account->categories()->sync($request->input('category_ids', []));
+        }
+
+        return $this->ok($account->load('categories'), 'تم إنشاء الحساب', 201);
+    }
+
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $account = Account::query()->findOrFail($id);
+        $data = $request->validate($this->rules($request, $id));
+
+        $newParent = $data['parent_id'] ?? null;
+        $this->service->assertNoCycle($account, $newParent);
+        $this->service->assertTypeMatchesParent($data['type'] ?? $account->type, $newParent);
+
+        $account->update($data);
+        $this->service->refreshParentPostable($account->parent_id);
+        if ($request->has('category_ids')) {
+            $account->categories()->sync($request->input('category_ids', []));
+        }
+
+        return $this->ok($account->fresh('categories'), 'تم تحديث الحساب');
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        $account = Account::query()->withCount('children')->findOrFail($id);
+        if ($account->children_count > 0) {
+            return $this->ok(null, 'لا يمكن حذف حساب له حسابات فرعية', 422);
+        }
+        $account->delete();
+
+        return $this->ok(null, 'تم حذف الحساب');
+    }
+
+    /** الشجرة الكاملة مع الأرصدة المجمّعة. */
+    public function tree(): JsonResponse
+    {
+        return $this->ok($this->service->tree());
+    }
+
+    /** رصيد حساب مجمّعاً (Bottom-up). */
+    public function balance(int $id): JsonResponse
+    {
+        $account = Account::query()->findOrFail($id);
+
+        return $this->ok([
+            'account_id' => $account->id,
+            'code' => $account->code,
+            'balance' => $this->service->balanceOf($account),
+            'normal_balance' => $account->normal_balance,
+        ]);
+    }
+
+    /** استيراد شجرة حسابات (معاينة أو تنفيذ). */
+    public function import(Request $request): JsonResponse
+    {
+        $payload = $request->validate([
+            'rows' => ['required', 'array', 'min:1'],
+            'commit' => ['boolean'],
+        ]);
+
+        $result = $this->service->import($payload['rows'], (bool) ($payload['commit'] ?? false));
+
+        $message = ! empty($result['errors'])
+            ? 'توجد أخطاء — لم يتم الاستيراد'
+            : ((bool) ($payload['commit'] ?? false) ? "تم استيراد {$result['imported']} حساباً" : 'المعاينة جاهزة');
+
+        return $this->ok($result, $message, empty($result['errors']) ? 200 : 422);
+    }
+}

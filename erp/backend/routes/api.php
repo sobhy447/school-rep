@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Accounting\AccountController;
+use App\Http\Controllers\Accounting\AccountCategoryController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CostCenterController;
 use App\Http\Controllers\Settings\CurrencyController;
@@ -46,4 +48,23 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
         Route::post('fiscal-years/{id}/unlock', [FiscalYearController::class, 'unlock'])
             ->middleware('permission:settings.lock');
     });
+
+    // ===== المرحلة 2: دليل الحسابات =====
+    // فئات الحسابات (تعدد الفئات)
+    Route::get('account-categories', [AccountCategoryController::class, 'index'])->middleware('permission:accounts.view');
+    Route::get('account-categories/grouped', [AccountCategoryController::class, 'grouped'])->middleware('permission:accounts.view');
+    Route::get('account-categories/{id}', [AccountCategoryController::class, 'show'])->middleware('permission:accounts.view');
+    Route::post('account-categories', [AccountCategoryController::class, 'store'])->middleware('permission:accounts.create');
+    Route::put('account-categories/{id}', [AccountCategoryController::class, 'update'])->middleware('permission:accounts.edit');
+    Route::delete('account-categories/{id}', [AccountCategoryController::class, 'destroy'])->middleware('permission:accounts.delete');
+
+    // دليل الحسابات
+    Route::get('accounts/tree', [AccountController::class, 'tree'])->middleware('permission:accounts.view');
+    Route::post('accounts/import', [AccountController::class, 'import'])->middleware('permission:accounts.create');
+    Route::get('accounts/{id}/balance', [AccountController::class, 'balance'])->middleware('permission:accounts.view');
+    Route::get('accounts', [AccountController::class, 'index'])->middleware('permission:accounts.view');
+    Route::get('accounts/{id}', [AccountController::class, 'show'])->middleware('permission:accounts.view');
+    Route::post('accounts', [AccountController::class, 'store'])->middleware('permission:accounts.create');
+    Route::put('accounts/{id}', [AccountController::class, 'update'])->middleware('permission:accounts.edit');
+    Route::delete('accounts/{id}', [AccountController::class, 'destroy'])->middleware('permission:accounts.delete');
 });
