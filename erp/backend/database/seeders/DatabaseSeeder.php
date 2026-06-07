@@ -42,6 +42,8 @@ class DatabaseSeeder extends Seeder
             'fixed_assets' => ['الأصول الثابتة', 'Fixed Assets'],
             'banks' => ['البنوك والتسويات', 'Banks & Reconciliation'],
             'inventory' => ['المخزون', 'Inventory'],
+            'purchases' => ['المشتريات', 'Purchases'],
+            'sales' => ['المبيعات', 'Sales'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {
@@ -124,11 +126,13 @@ class DatabaseSeeder extends Seeder
             ['1103', 'العملاء', 'ASSET', '11'],
             ['1104', 'عهد الموظفين', 'ASSET', '11'],
             ['1105', 'المخزون', 'ASSET', '11'],
+            ['1106', 'ضريبة المدخلات', 'ASSET', '11'],
             ['12', 'الأصول الثابتة', 'ASSET', '1'],
             ['1201', 'سيارات', 'ASSET', '12'],
             ['1202', 'مجمع إهلاك السيارات', 'ASSET', '12'],
             ['2', 'الخصوم', 'LIABILITY', null],
             ['21', 'الموردون', 'LIABILITY', '2'],
+            ['22', 'ضريبة المخرجات المستحقة', 'LIABILITY', '2'],
             ['3', 'حقوق الملكية', 'EQUITY', null],
             ['31', 'رأس المال', 'EQUITY', '3'],
             ['32', 'الأرباح المحتجزة', 'EQUITY', '3'],
@@ -186,6 +190,8 @@ class DatabaseSeeder extends Seeder
         \App\Models\CompanySetting::put($companyId, 'petty_cash_account_id', (string) ($idByCode['1104'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'income_summary_account_id', (string) ($idByCode['39'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'retained_earnings_account_id', (string) ($idByCode['32'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'vat_input_account_id', (string) ($idByCode['1106'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'vat_output_account_id', (string) ($idByCode['22'] ?? ''));
 
         // مخزون: مخزن + صنفان مرتبطان بالحسابات
         $wh = \App\Models\Warehouse::firstOrCreate(

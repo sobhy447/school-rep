@@ -15,6 +15,8 @@ use App\Http\Controllers\Accounting\BankReconciliationController;
 use App\Http\Controllers\Accounting\WarehouseController;
 use App\Http\Controllers\Accounting\InventoryItemController;
 use App\Http\Controllers\Accounting\StockController;
+use App\Http\Controllers\Accounting\PurchaseInvoiceController;
+use App\Http\Controllers\Accounting\SalesInvoiceController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -173,4 +175,16 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::post('stock/issue', [StockController::class, 'issue'])->middleware('permission:inventory.create');
     Route::post('stock/transfer', [StockController::class, 'transfer'])->middleware('permission:inventory.create');
     Route::post('stock/adjust', [StockController::class, 'adjust'])->middleware('permission:inventory.edit');
+
+    // ===== المرحلة 9: المشتريات =====
+    Route::get('purchase-invoices', [PurchaseInvoiceController::class, 'index'])->middleware('permission:purchases.view');
+    Route::get('purchase-invoices/{id}', [PurchaseInvoiceController::class, 'show'])->middleware('permission:purchases.view');
+    Route::post('purchase-invoices', [PurchaseInvoiceController::class, 'store'])->middleware('permission:purchases.create');
+    Route::post('purchase-invoices/{id}/post', [PurchaseInvoiceController::class, 'post'])->middleware('permission:purchases.post');
+
+    // ===== المرحلة 9: المبيعات =====
+    Route::get('sales-invoices', [SalesInvoiceController::class, 'index'])->middleware('permission:sales.view');
+    Route::get('sales-invoices/{id}', [SalesInvoiceController::class, 'show'])->middleware('permission:sales.view');
+    Route::post('sales-invoices', [SalesInvoiceController::class, 'store'])->middleware('permission:sales.create');
+    Route::post('sales-invoices/{id}/post', [SalesInvoiceController::class, 'post'])->middleware('permission:sales.post');
 });

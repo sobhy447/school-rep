@@ -15,6 +15,7 @@ class CompanySettingController extends Controller
 {
     private const ALLOWED = [
         'petty_cash_account_id', 'income_summary_account_id', 'retained_earnings_account_id',
+        'vat_input_account_id', 'vat_output_account_id',
     ];
 
     public function index(): JsonResponse
