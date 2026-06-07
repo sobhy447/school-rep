@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/ErrorResponse');
+const { protect } = require('../middleware/auth');
 
 // @desc    Login user
 // @route   POST /api/auth/login
@@ -44,7 +45,7 @@ router.post('/login', asyncHandler(async (req, res, next) => {
 // @desc    Get current user
 // @route   GET /api/auth/me
 // @access  Private
-router.get('/me', asyncHandler(async (req, res, next) => {
+router.get('/me', protect, asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
   res.status(200).json({
