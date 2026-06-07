@@ -43,7 +43,18 @@ const SCREENS = { dashboard: Dashboard, accounts: Accounts, journal: JournalEntr
   settings: Settings, assets: FixedAssets, banks: Banks, inventory: Inventory,
   purchases: Purchases, sales: Sales, hr: Hr, pos: Pos }
 
-const TITLES = Object.fromEntries(NAV.flatMap((g) => g.items.map(([k, label]) => [k, label])))
+const TITLES = Object.fromEntries(NAV.flatMap((g) => g.items.map(([k, label, ico]) => [k, { label, ico }])))
+
+// وصف موجز لكل موديول يظهر في شريط الرأس
+const DESC = {
+  dashboard: 'نظرة عامة على المؤشرات المالية', accounts: 'الشجرة المحاسبية وأرصدة الحسابات',
+  journal: 'إدخال ومراجعة القيود اليومية', vouchers: 'سندات القبض والصرف والتحويل',
+  pettycash: 'كشوف العهد وتحويلها لسندات', settlement: 'مطابقة الأمانات بالاستحقاقات',
+  assets: 'تسجيل الأصول وحساب الإهلاك', banks: 'تسوية الحسابات البنكية',
+  inventory: 'الأصناف والمخازن وحركة المخزون', purchases: 'فواتير الموردين',
+  sales: 'فواتير العملاء', hr: 'الموظفون ومسير الرواتب', pos: 'البيع النقدي السريع',
+  reports: 'القوائم المالية والتقارير', settings: 'إعدادات النظام الأساسية',
+}
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -87,9 +98,10 @@ export default function App() {
 
   const Screen = SCREENS[section]
   const initial = (user.name || '?').trim().charAt(0)
+  const meta = TITLES[section]
 
   return (
-    <div className="app">
+    <div className="app" data-module={section}>
       <aside className="sidebar">
         <div className="brand"><span className="logo">📒</span> نظام المحاسبة</div>
         {NAV.map((g) => (
@@ -106,7 +118,7 @@ export default function App() {
 
       <div className="main">
         <header className="topbar">
-          <div className="title">{TITLES[section]}</div>
+          <div className="title">{meta.label}</div>
           <div className="right">
             <span className="chip">🏢 {user.company?.name}</span>
             <span className="chip">{user.role?.name}</span>
@@ -115,6 +127,10 @@ export default function App() {
           </div>
         </header>
         <main className="content">
+          <div className="page-banner">
+            <span className="pb-ico">{meta.ico}</span>
+            <div><h2>{meta.label}</h2><p>{DESC[section]}</p></div>
+          </div>
           <Screen />
         </main>
       </div>
