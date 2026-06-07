@@ -124,7 +124,7 @@ class AccountController extends BaseCrudController
             ->where('company_id', TenantContext::id())
             ->where('account_id', $id)
             ->whereHas('journalEntry', fn ($q) => $q->where('status', 'POSTED'))
-            ->with('journalEntry:id,entry_number,entry_date,description')
+            ->with('journalEntry:id,entry_number,entry_date,description', 'journalEntry.attachments:id,journal_entry_id,file_name')
             ->get()
             ->sortBy(fn ($l) => [optional($l->journalEntry)->entry_date, $l->id])
             ->values();
@@ -136,6 +136,7 @@ class AccountController extends BaseCrudController
             $debit = (float) $l->debit;
             $credit = (float) $l->credit;
             $running = round($running + AccountType::signedBalance($account->type, $debit, $credit), 3);
+            $attachment = $l->journalEntry?->attachments->first();
             $rows[] = [
                 'entry_number' => $l->journalEntry?->entry_number,
                 'date' => optional($l->journalEntry?->entry_date)->toDateString(),
@@ -143,6 +144,11 @@ class AccountController extends BaseCrudController
                 'debit' => $debit,
                 'credit' => $credit,
                 'balance' => $running,
+                // مراجع المرفقات والصفحات (أساس طباعة كشف الحساب بالمرفقات)
+                'page_from' => $l->page_from,
+                'page_to' => $l->page_to,
+                'attachment_id' => $attachment?->id,
+                'attachment_name' => $attachment?->file_name,
             ];
         }
 

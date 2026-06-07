@@ -37,6 +37,11 @@ class JournalEntry extends Model
         return $this->hasMany(JournalLine::class)->orderBy('line_number');
     }
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(DocumentAttachment::class);
+    }
+
     public function fiscalYear(): BelongsTo
     {
         return $this->belongsTo(FiscalYear::class);

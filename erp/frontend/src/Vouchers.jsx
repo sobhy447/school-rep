@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from './api.js'
+import AttachmentsModal from './AttachmentsModal.jsx'
 
 const emptyLine = () => ({ account_id: '', amount: '', cost_center_id: '', cost_center_extra_id: '' })
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
@@ -11,7 +12,7 @@ export default function Vouchers() {
   const [costCenters, setCostCenters] = useState([]); const [list, setList] = useState([])
   const [head, setHead] = useState({ entry_date: new Date().toISOString().slice(0, 10), party_name: '', description: '' })
   const [main, setMain] = useState({ account_id: '', amount: '' }); const [lines, setLines] = useState([emptyLine()])
-  const [msg, setMsg] = useState(null); const [err, setErr] = useState(null)
+  const [msg, setMsg] = useState(null); const [err, setErr] = useState(null); const [attachEntry, setAttachEntry] = useState(null)
 
   const reload = async () => {
     const [y, a, c, v] = await Promise.all([api.get('/settings/fiscal-years'), api.get('/accounts'), api.get('/settings/cost-centers'), api.get('/vouchers')])
@@ -92,15 +93,16 @@ export default function Vouchers() {
       <div className="card">
         <h4>السندات الأخيرة</h4>
         <table>
-          <thead><tr><th>الرقم</th><th>النوع</th><th>التاريخ</th><th>الطرف</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+          <thead><tr><th>الرقم</th><th>النوع</th><th>التاريخ</th><th>الطرف</th><th>المبلغ</th><th>الحالة</th><th>مرفقات</th></tr></thead>
           <tbody>
             {list.map((v) => (
-              <tr key={v.id}><td>{v.entry_number}</td><td>{typeAr(v.type)}</td><td>{String(v.entry_date).slice(0, 10)}</td><td>{v.party_name}</td><td>{n(v.total_debit)}</td><td><span className="badge badge-green">مرحّل</span></td></tr>
+              <tr key={v.id}><td>{v.entry_number}</td><td>{typeAr(v.type)}</td><td>{String(v.entry_date).slice(0, 10)}</td><td>{v.party_name}</td><td>{n(v.total_debit)}</td><td><span className="badge badge-green">مرحّل</span></td><td><button className="btn btn-sm" onClick={() => setAttachEntry(v.id)}>📎</button></td></tr>
             ))}
-            {list.length === 0 && <tr><td colSpan={6} className="muted">لا توجد سندات</td></tr>}
+            {list.length === 0 && <tr><td colSpan={7} className="muted">لا توجد سندات</td></tr>}
           </tbody>
         </table>
       </div>
+      {attachEntry && <AttachmentsModal entryId={attachEntry} onClose={() => setAttachEntry(null)} />}
     </div>
   )
 }

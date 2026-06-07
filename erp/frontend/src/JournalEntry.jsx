@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import api from './api.js'
+import AttachmentsModal from './AttachmentsModal.jsx'
 
 const emptyLine = () => ({ account_id: '', debit: '', credit: '', cost_center_id: '', cost_center_extra_id: '', reference_number: '', description: '', counterparty_name: '' })
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
@@ -12,6 +13,7 @@ export default function JournalEntry() {
   const [header, setHeader] = useState({ entry_date: new Date().toISOString().slice(0, 10), description: '', currency_code: 'KWD', exchange_rate: 1 })
   const [lines, setLines] = useState([emptyLine(), emptyLine()])
   const [msg, setMsg] = useState(null); const [err, setErr] = useState(null)
+  const [attachEntry, setAttachEntry] = useState(null)
   const lineRefs = useRef([])
 
   const reload = async () => {
@@ -108,6 +110,7 @@ export default function JournalEntry() {
                   {e.status === 'DRAFT' && <button className="btn-primary btn-sm" onClick={() => action(e.id, 'approve')}>اعتماد</button>}
                   {e.status === 'APPROVED' && <button className="btn-primary btn-sm" onClick={() => action(e.id, 'post')}>ترحيل</button>}
                   {e.status === 'POSTED' && <button className="btn btn-sm" onClick={() => action(e.id, 'reverse')}>عكس</button>}
+                  <button className="btn btn-sm" onClick={() => setAttachEntry(e.id)}>📎</button>
                 </td>
               </tr>
             ))}
@@ -115,6 +118,7 @@ export default function JournalEntry() {
           </tbody>
         </table>
       </div>
+      {attachEntry && <AttachmentsModal entryId={attachEntry} onClose={() => setAttachEntry(null)} />}
     </div>
   )
 }

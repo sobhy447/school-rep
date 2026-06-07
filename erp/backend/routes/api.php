@@ -21,6 +21,8 @@ use App\Http\Controllers\Accounting\EmployeeController;
 use App\Http\Controllers\Accounting\SalaryComponentController;
 use App\Http\Controllers\Accounting\PayrollController;
 use App\Http\Controllers\Accounting\PosController;
+use App\Http\Controllers\Accounting\AttachmentController;
+use App\Http\Controllers\Accounting\ReminderController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -215,4 +217,21 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::get('pos', [PosController::class, 'index'])->middleware('permission:pos.view');
     Route::get('pos/{id}', [PosController::class, 'show'])->middleware('permission:pos.view');
     Route::post('pos/checkout', [PosController::class, 'checkout'])->middleware('permission:pos.create');
+
+    // ===== المرحلة 12: المرفقات (PDF) وربط صفحات السطور =====
+    Route::get('journal-entries/{id}/attachments', [AttachmentController::class, 'index'])->middleware('permission:journals.view');
+    Route::post('journal-entries/{id}/attachments', [AttachmentController::class, 'upload'])->middleware('permission:journals.edit');
+    Route::post('journal-entries/{id}/line-pages', [AttachmentController::class, 'setLinePages'])->middleware('permission:journals.edit');
+    Route::get('attachments/{id}/download', [AttachmentController::class, 'download'])->middleware('permission:journals.view');
+    Route::delete('attachments/{id}', [AttachmentController::class, 'destroy'])->middleware('permission:journals.edit');
+
+    // ===== المرحلة 13: التذكيرات/التنبيهات =====
+    Route::get('reminders', [ReminderController::class, 'index'])->middleware('permission:reminders.view');
+    Route::get('reminders/due', [ReminderController::class, 'due'])->middleware('permission:reminders.view');
+    Route::post('reminders', [ReminderController::class, 'store'])->middleware('permission:reminders.create');
+    Route::post('reminders/generate', [ReminderController::class, 'generate'])->middleware('permission:reminders.create');
+    Route::put('reminders/{id}', [ReminderController::class, 'update'])->middleware('permission:reminders.edit');
+    Route::post('reminders/{id}/done', [ReminderController::class, 'markDone'])->middleware('permission:reminders.edit');
+    Route::post('reminders/{id}/dismiss', [ReminderController::class, 'dismiss'])->middleware('permission:reminders.edit');
+    Route::delete('reminders/{id}', [ReminderController::class, 'destroy'])->middleware('permission:reminders.delete');
 });

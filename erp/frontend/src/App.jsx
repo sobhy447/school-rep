@@ -14,6 +14,7 @@ import Inventory from './Inventory.jsx'
 import { Purchases, Sales } from './Trade.jsx'
 import Hr from './Hr.jsx'
 import Pos from './Pos.jsx'
+import Reminders from './Reminders.jsx'
 
 // مجموعات قائمة التنقّل
 const NAV = [
@@ -35,13 +36,13 @@ const NAV = [
     ['pos', 'نقطة البيع', '🛍️'],
   ] },
   { group: 'التقارير', items: [['reports', 'التقارير', '📑']] },
-  { group: 'النظام', items: [['settings', 'الإعدادات', '⚙️']] },
+  { group: 'النظام', items: [['reminders', 'التذكيرات', '🔔'], ['settings', 'الإعدادات', '⚙️']] },
 ]
 
 const SCREENS = { dashboard: Dashboard, accounts: Accounts, journal: JournalEntry,
   vouchers: Vouchers, pettycash: PettyCash, settlement: Settlement, reports: Reports,
   settings: Settings, assets: FixedAssets, banks: Banks, inventory: Inventory,
-  purchases: Purchases, sales: Sales, hr: Hr, pos: Pos }
+  purchases: Purchases, sales: Sales, hr: Hr, pos: Pos, reminders: Reminders }
 
 const TITLES = Object.fromEntries(NAV.flatMap((g) => g.items.map(([k, label, ico]) => [k, { label, ico }])))
 
@@ -54,6 +55,7 @@ const DESC = {
   inventory: 'الأصناف والمخازن وحركة المخزون', purchases: 'فواتير الموردين',
   sales: 'فواتير العملاء', hr: 'الموظفون ومسير الرواتب', pos: 'البيع النقدي السريع',
   reports: 'القوائم المالية والتقارير', settings: 'إعدادات النظام الأساسية',
+  reminders: 'تنبيهات الاستحقاقات وإعادة الطلب',
 }
 
 export default function App() {
@@ -63,11 +65,17 @@ export default function App() {
   const [password, setPassword] = useState('password')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [remCount, setRemCount] = useState(0)
 
   useEffect(() => {
     document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'
     if (localStorage.getItem('token')) api.get('/me').then((r) => setUser(r.data.data)).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    api.get('/reminders/due').then((r) => setRemCount(r.data.data.count)).catch(() => {})
+  }, [user, section])
 
   const login = async (e) => {
     e.preventDefault(); setError(null); setLoading(true)
@@ -120,6 +128,11 @@ export default function App() {
         <header className="topbar">
           <div className="title">{meta.label}</div>
           <div className="right">
+            <button className="btn-ghost" onClick={() => setSection('reminders')} title="التذكيرات"
+              style={{ position: 'relative', fontSize: 18 }}>
+              🔔
+              {remCount > 0 && <span style={{ position: 'absolute', top: -2, insetInlineEnd: -2, background: '#ef4444', color: '#fff', borderRadius: 999, fontSize: 10, fontWeight: 700, minWidth: 16, height: 16, display: 'grid', placeItems: 'center', padding: '0 3px' }}>{remCount}</span>}
+            </button>
             <span className="chip">🏢 {user.company?.name}</span>
             <span className="chip">{user.role?.name}</span>
             <div className="avatar">{initial}</div>
