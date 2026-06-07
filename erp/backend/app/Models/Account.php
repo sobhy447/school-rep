@@ -15,7 +15,7 @@ class Account extends Model
     use BelongsToCompany, SoftDeletes;
 
     protected $fillable = [
-        'company_id', 'parent_id', 'code', 'name', 'name_en', 'type', 'is_cash_or_bank',
+        'company_id', 'parent_id', 'code', 'name', 'name_en', 'type', 'is_cash_or_bank', 'party_type',
         'accepts_entries', 'opening_balance', 'opening_balance_type',
         'currency_code', 'cost_center_id', 'tax_rate_id', 'cost_center_required',
         'meta', 'is_active',

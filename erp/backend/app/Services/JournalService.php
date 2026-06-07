@@ -41,11 +41,11 @@ class JournalService
      * إنشاء قيد + أسطره داخل Transaction، مع كل التحقّقات المحاسبية.
      * كل سطر: account_id (أو يُستدعى من مركز التكلفة الإضافي)، debit XOR credit، مركز تكلفة أساسي.
      */
-    public function create(int $companyId, ?int $userId, array $data, string $type = 'MANUAL'): JournalEntry
+    public function create(int $companyId, ?int $userId, array $data, string $type = 'MANUAL', bool $requireCostCenter = true): JournalEntry
     {
         $this->assertFiscalYear($companyId, $data['fiscal_year_id'], $data['entry_date']);
 
-        $lines = $this->prepareLines($data['lines'] ?? []);
+        $lines = $this->prepareLines($data['lines'] ?? [], $requireCostCenter);
         [$totalDebit, $totalCredit] = $this->assertBalanced($lines);
 
         return DB::transaction(function () use ($companyId, $userId, $data, $type, $lines, $totalDebit, $totalCredit) {
@@ -242,7 +242,7 @@ class JournalService
     // ───────────── مساعدات داخلية ─────────────
 
     /** يحضّر الأسطر: يستدعي الحساب من مركز التكلفة الإضافي، يجلب اسم الخصم، ويتحقّق. */
-    private function prepareLines(array $rawLines): array
+    private function prepareLines(array $rawLines, bool $requireCostCenter = true): array
     {
         if (empty($rawLines)) {
             throw ValidationException::withMessages(['lines' => ['القيد يحتاج سطراً واحداً على الأقل']]);
@@ -286,8 +286,8 @@ class JournalService
                 ]);
             }
 
-            // مركز التكلفة الأساسي إجباري لكل سطر عدا الجانب الرئيسي للسند
-            if (! $isMain && empty($line['cost_center_id'])) {
+            // مركز التكلفة الأساسي إجباري لكل سطر عدا الجانب الرئيسي للسند (وعدا القيود الختامية)
+            if ($requireCostCenter && ! $isMain && empty($line['cost_center_id'])) {
                 throw ValidationException::withMessages([
                     'lines' => ["السطر {$lineNo}: مركز التكلفة الأساسي إجباري"],
                 ]);

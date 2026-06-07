@@ -119,11 +119,14 @@ class DatabaseSeeder extends Seeder
             ['1101', 'الصندوق', 'ASSET', '11'],
             ['1102', 'البنك', 'ASSET', '11'],
             ['1103', 'العملاء', 'ASSET', '11'],
+            ['1104', 'عهد الموظفين', 'ASSET', '11'],
             ['12', 'الأصول الثابتة', 'ASSET', '1'],
             ['2', 'الخصوم', 'LIABILITY', null],
             ['21', 'الموردون', 'LIABILITY', '2'],
             ['3', 'حقوق الملكية', 'EQUITY', null],
             ['31', 'رأس المال', 'EQUITY', '3'],
+            ['32', 'الأرباح المحتجزة', 'EQUITY', '3'],
+            ['39', 'حساب النتيجة', 'EQUITY', '3'],
             ['4', 'الإيرادات', 'REVENUE', null],
             ['41', 'إيرادات الأتعاب', 'REVENUE', '4'],
             ['5', 'المصروفات', 'EXPENSE', null],
@@ -149,6 +152,14 @@ class DatabaseSeeder extends Seeder
             ->where('company_id', $companyId)->whereIn('code', ['1101', '1102'])
             ->update(['is_cash_or_bank' => true]);
 
+        // تعليم حساب العملاء كـ «عميل» (الأطراف حسابات في الشجرة)
+        Account::query()->withoutGlobalScopes()
+            ->where('company_id', $companyId)->where('code', '1103')
+            ->update(['party_type' => 'CUSTOMER']);
+        Account::query()->withoutGlobalScopes()
+            ->where('company_id', $companyId)->where('code', '21')
+            ->update(['party_type' => 'VENDOR']);
+
         // مركز تكلفة إضافي مربوط بحساب العملاء + اسم موكل/خصم (تدفّق مكاتب المحاماة)
         if (isset($idByCode['1103'])) {
             \App\Models\CostCenter::firstOrCreate(
@@ -158,6 +169,26 @@ class DatabaseSeeder extends Seeder
                     'linked_account_id' => $idByCode['1103'],
                     'client_name' => 'موكل تجريبي',
                     'counterparty_name' => 'خصم تجريبي',
+                ]
+            );
+        }
+
+        // إعدادات الشركة: حساب العهدة + النتيجة + الأرباح المحتجزة
+        \App\Models\CompanySetting::put($companyId, 'petty_cash_account_id', (string) ($idByCode['1104'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'income_summary_account_id', (string) ($idByCode['39'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'retained_earnings_account_id', (string) ($idByCode['32'] ?? ''));
+
+        // بنود العهد (بحدود تكرار)
+        foreach ([
+            ['PRINT', 'طباعة', 5.000, 3, 1, false],
+            ['TRANSPORT', 'مواصلات', null, null, null, false],
+        ] as [$code, $name, $def, $maxR, $forb, $perm]) {
+            \App\Models\PettyCashItem::firstOrCreate(
+                ['company_id' => $companyId, 'code' => $code],
+                [
+                    'name' => $name, 'default_amount' => $def, 'max_repeat' => $maxR,
+                    'forbidden_months' => $forb, 'is_permanent' => $perm,
+                    'expense_account_id' => $idByCode['51'] ?? null,
                 ]
             );
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Http\Controllers\Settings\BaseCrudController;
 use App\Models\Account;
+use App\Models\JournalLine;
 use App\Services\AccountService;
 use App\Support\AccountType;
 use App\Support\TenantContext;
@@ -100,6 +101,58 @@ class AccountController extends BaseCrudController
         $account->delete();
 
         return $this->ok(null, 'تم حذف الحساب');
+    }
+
+    /** قائمة الأطراف (عملاء/موردون) — وهم حسابات في الشجرة. */
+    public function parties(Request $request): JsonResponse
+    {
+        $type = $request->query('type'); // CUSTOMER / VENDOR
+        $items = Account::query()
+            ->when($type, fn ($q) => $q->where('party_type', $type),
+                fn ($q) => $q->whereNotNull('party_type'))
+            ->orderBy('code')->get();
+
+        return $this->ok($items);
+    }
+
+    /** كشف حساب: الرصيد الافتتاحي + الحركات المُرحَّلة + الرصيد الجاري. */
+    public function statement(int $id): JsonResponse
+    {
+        $account = Account::query()->findOrFail($id);
+
+        $lines = JournalLine::query()
+            ->where('company_id', TenantContext::id())
+            ->where('account_id', $id)
+            ->whereHas('journalEntry', fn ($q) => $q->where('status', 'POSTED'))
+            ->with('journalEntry:id,entry_number,entry_date,description')
+            ->get()
+            ->sortBy(fn ($l) => [optional($l->journalEntry)->entry_date, $l->id])
+            ->values();
+
+        $running = $account->signedOpeningBalance();
+        $opening = $running;
+        $rows = [];
+        foreach ($lines as $l) {
+            $debit = (float) $l->debit;
+            $credit = (float) $l->credit;
+            $running = round($running + AccountType::signedBalance($account->type, $debit, $credit), 3);
+            $rows[] = [
+                'entry_number' => $l->journalEntry?->entry_number,
+                'date' => optional($l->journalEntry?->entry_date)->toDateString(),
+                'description' => $l->description ?: $l->journalEntry?->description,
+                'debit' => $debit,
+                'credit' => $credit,
+                'balance' => $running,
+            ];
+        }
+
+        return $this->ok([
+            'account' => ['id' => $account->id, 'code' => $account->code, 'name' => $account->name,
+                          'type' => $account->type, 'normal_balance' => $account->normal_balance],
+            'opening_balance' => $opening,
+            'lines' => $rows,
+            'closing_balance' => $running,
+        ]);
     }
 
     /** بحث ذكي عن الحسابات الورقية (F1 في شاشة القيد). */

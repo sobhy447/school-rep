@@ -5,7 +5,12 @@ use App\Http\Controllers\Accounting\AccountController;
 use App\Http\Controllers\Accounting\AccountCategoryController;
 use App\Http\Controllers\Accounting\JournalEntryController;
 use App\Http\Controllers\Accounting\VoucherController;
+use App\Http\Controllers\Accounting\PettyCashItemController;
+use App\Http\Controllers\Accounting\ExpenseClaimController;
+use App\Http\Controllers\Accounting\SettlementController;
+use App\Http\Controllers\Accounting\ClosingController;
 use App\Http\Controllers\Settings\BranchController;
+use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
 use App\Http\Controllers\Settings\CurrencyController;
 use App\Http\Controllers\Settings\FiscalYearController;
@@ -61,6 +66,8 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::delete('account-categories/{id}', [AccountCategoryController::class, 'destroy'])->middleware('permission:accounts.delete');
 
     // دليل الحسابات
+    Route::get('accounts/parties', [AccountController::class, 'parties'])->middleware('permission:accounts.view');
+    Route::get('accounts/{id}/statement', [AccountController::class, 'statement'])->middleware('permission:accounts.view');
     Route::get('accounts/search', [AccountController::class, 'search'])->middleware('permission:accounts.view');
     Route::get('accounts/tree', [AccountController::class, 'tree'])->middleware('permission:accounts.view');
     Route::post('accounts/import', [AccountController::class, 'import'])->middleware('permission:accounts.create');
@@ -87,4 +94,29 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::get('vouchers/{id}', [VoucherController::class, 'show'])->middleware('permission:vouchers.view');
     Route::post('vouchers', [VoucherController::class, 'store'])->middleware('permission:vouchers.create');
     Route::post('vouchers/{id}/reverse', [VoucherController::class, 'reverse'])->middleware('permission:vouchers.unpost');
+
+    // ===== المرحلة 4: العهد =====
+    Route::get('petty-cash-items', [PettyCashItemController::class, 'index'])->middleware('permission:petty_cash.view');
+    Route::get('petty-cash-items/{id}', [PettyCashItemController::class, 'show'])->middleware('permission:petty_cash.view');
+    Route::post('petty-cash-items', [PettyCashItemController::class, 'store'])->middleware('permission:petty_cash.create');
+    Route::put('petty-cash-items/{id}', [PettyCashItemController::class, 'update'])->middleware('permission:petty_cash.edit');
+    Route::delete('petty-cash-items/{id}', [PettyCashItemController::class, 'destroy'])->middleware('permission:petty_cash.delete');
+
+    Route::get('expense-claims', [ExpenseClaimController::class, 'index'])->middleware('permission:petty_cash.view');
+    Route::get('expense-claims/{id}', [ExpenseClaimController::class, 'show'])->middleware('permission:petty_cash.view');
+    Route::post('expense-claims', [ExpenseClaimController::class, 'store'])->middleware('permission:petty_cash.create');
+    Route::post('expense-claims/{id}/approve', [ExpenseClaimController::class, 'approve'])->middleware('permission:petty_cash.approve');
+    Route::post('expense-claims/{id}/convert', [ExpenseClaimController::class, 'convert'])->middleware('permission:petty_cash.post');
+
+    // ===== المرحلة 4: الأمانات/السداد =====
+    Route::get('settlements/summary', [SettlementController::class, 'summary'])->middleware('permission:settlements.view');
+    Route::get('settlements/customer/{accountId}', [SettlementController::class, 'customer'])->middleware('permission:settlements.view');
+    Route::post('settlements/customer/{accountId}/allocate', [SettlementController::class, 'allocate'])->middleware('permission:settlements.create');
+
+    // ===== المرحلة 4: الإقفال السنوي =====
+    Route::post('closing/close-year', [ClosingController::class, 'close'])->middleware('permission:journals.lock');
+
+    // إعدادات الشركة (خرائط الحسابات)
+    Route::get('company-settings', [CompanySettingController::class, 'index'])->middleware('permission:settings.view');
+    Route::put('company-settings', [CompanySettingController::class, 'update'])->middleware('permission:settings.edit');
 });
