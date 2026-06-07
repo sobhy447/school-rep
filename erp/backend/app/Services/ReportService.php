@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\CompanySetting;
 use App\Models\JournalLine;
 use App\Models\SettlementAllocation;
 use App\Support\AccountType;
@@ -258,6 +259,32 @@ class ReportService
             $grouped[$cid]['remaining'] = round($grouped[$cid]['remaining'] + $d['remaining'], 3);
         }
         return ['rows' => array_values($grouped)];
+    }
+
+    /**
+     * تقرير ضريبة القيمة المضافة: ضريبة المخرجات (مبيعات) − ضريبة المدخلات (مشتريات).
+     * النتيجة الموجبة = مستحقّة للدولة، السالبة = رصيد قابل للاسترداد.
+     */
+    public function vatReport(?string $from = null, ?string $to = null): array
+    {
+        $companyId = TenantContext::id();
+        $mv = $this->movements($companyId, $from, $to);
+        $inputId = (int) CompanySetting::get($companyId, 'vat_input_account_id', 0);
+        $outputId = (int) CompanySetting::get($companyId, 'vat_output_account_id', 0);
+
+        // ضريبة المدخلات حساب أصل (مدين)، المخرجات خصم (دائن)
+        $inMv = $mv[$inputId] ?? ['d' => 0.0, 'c' => 0.0];
+        $outMv = $mv[$outputId] ?? ['d' => 0.0, 'c' => 0.0];
+        $inputTax = round($inMv['d'] - $inMv['c'], 3);     // صافي ضريبة المدخلات
+        $outputTax = round($outMv['c'] - $outMv['d'], 3);  // صافي ضريبة المخرجات
+        $net = round($outputTax - $inputTax, 3);
+
+        return [
+            'output_tax' => $outputTax,
+            'input_tax' => $inputTax,
+            'net_vat' => $net,
+            'status' => $net >= 0 ? 'مستحقّة للدولة' : 'رصيد قابل للاسترداد',
+        ];
     }
 
     /** لوحة المؤشرات. */

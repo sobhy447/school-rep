@@ -35,7 +35,7 @@ class TradeTest extends TestCase
         $cid = $this->company->id;
         $role = Role::create(['company_id' => $cid, 'slug' => 'r', 'name' => 'د']);
         $keys = [];
-        foreach (['purchases', 'sales', 'inventory', 'accounts'] as $m) foreach (['view', 'create', 'edit', 'post'] as $a) $keys[] = "$m.$a";
+        foreach (['purchases', 'sales', 'inventory', 'accounts', 'reports'] as $m) foreach (['view', 'create', 'edit', 'post'] as $a) $keys[] = "$m.$a";
         $ids = collect($keys)->map(fn ($k) => Permission::firstOrCreate(['key' => $k], ['module' => explode('.', $k)[0], 'label_ar' => $k, 'label_en' => $k])->id)->all();
         $role->permissions()->sync($ids);
         $user = User::create(['company_id' => $cid, 'role_id' => $role->id, 'name' => 'م', 'email' => 'u' . uniqid() . '@t.test', 'password' => bcrypt('password'), 'is_active' => true]);
@@ -120,6 +120,28 @@ class TradeTest extends TestCase
             'lines' => [['item_id' => $this->item->id, 'quantity' => 10, 'unit_price' => 20]],
         ])->json('data.id');
         $this->actingAs($user)->postJson("/api/sales-invoices/{$id}/post")->assertStatus(422);
+    }
+
+    public function test_vat_report_nets_output_minus_input(): void
+    {
+        $user = $this->env();
+        // شراء: ضريبة مدخلات 5 (100 × 5%)
+        $pid = $this->actingAs($user)->postJson('/api/purchase-invoices', [
+            'fiscal_year_id' => $this->fy->id, 'vendor_account_id' => $this->acc['vendor']->id, 'warehouse_id' => $this->wh->id,
+            'invoice_date' => '2026-02-01', 'lines' => [['item_id' => $this->item->id, 'quantity' => 10, 'unit_price' => 10, 'tax_rate' => 5]],
+        ])->json('data.id');
+        $this->actingAs($user)->postJson("/api/purchase-invoices/{$pid}/post");
+        // بيع: ضريبة مخرجات 4 (80 × 5%)
+        $sid = $this->actingAs($user)->postJson('/api/sales-invoices', [
+            'fiscal_year_id' => $this->fy->id, 'customer_account_id' => $this->acc['customer']->id, 'warehouse_id' => $this->wh->id,
+            'invoice_date' => '2026-02-05', 'lines' => [['item_id' => $this->item->id, 'quantity' => 4, 'unit_price' => 20, 'tax_rate' => 5]],
+        ])->json('data.id');
+        $this->actingAs($user)->postJson("/api/sales-invoices/{$sid}/post");
+
+        $this->actingAs($user)->getJson('/api/reports/vat')->assertOk()
+            ->assertJsonPath('data.output_tax', 4)
+            ->assertJsonPath('data.input_tax', 5)
+            ->assertJsonPath('data.net_vat', -1);
     }
 
     public function test_cannot_post_twice(): void

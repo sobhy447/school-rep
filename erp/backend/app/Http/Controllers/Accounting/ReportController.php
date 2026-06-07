@@ -60,6 +60,12 @@ class ReportController extends Controller
         return $this->ok($this->service->claimsReport($detailed, $from, $to));
     }
 
+    public function vat(Request $r): JsonResponse
+    {
+        [$from, $to] = $this->range($r);
+        return $this->ok($this->service->vatReport($from, $to));
+    }
+
     public function dashboard(): JsonResponse
     {
         return $this->ok($this->service->dashboard());

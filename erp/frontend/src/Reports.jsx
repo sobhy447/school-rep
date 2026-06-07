@@ -7,6 +7,7 @@ const TABS = [
   ['balance-sheet', 'الميزانية العمومية'],
   ['cash-flow', 'التدفقات النقدية'],
   ['claims', 'تقرير الدعاوى'],
+  ['vat', 'ضريبة القيمة المضافة'],
 ]
 
 function exportCsv(filename, headers, rows) {
@@ -48,9 +49,20 @@ export default function Reports() {
         {data && tab === 'balance-sheet' && <BalanceSheet d={data} />}
         {data && tab === 'cash-flow' && <CashFlow d={data} />}
         {data && tab === 'claims' && <Claims d={data} mode={claimsMode} setMode={setClaimsMode} />}
+        {data && tab === 'vat' && <Vat d={data} />}
         {!data && !err && <p className="muted">جارٍ التحميل…</p>}
       </div>
     </div>
+  )
+}
+
+function Vat({ d }) {
+  return (
+    <Table head={['البند', 'المبلغ']} rows={[
+      ['ضريبة المخرجات (مبيعات)', n(d.output_tax)],
+      ['ضريبة المدخلات (مشتريات)', n(d.input_tax)],
+      [d.status, n(d.net_vat)],
+    ]} />
   )
 }
 

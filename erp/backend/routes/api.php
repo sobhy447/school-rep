@@ -139,6 +139,7 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
         Route::get('reports/general-ledger/{accountId}', [ReportController::class, 'generalLedger']);
         Route::get('reports/cash-flow', [ReportController::class, 'cashFlow']);
         Route::get('reports/claims', [ReportController::class, 'claims']);
+        Route::get('reports/vat', [ReportController::class, 'vat']);
         Route::get('reports/dashboard', [ReportController::class, 'dashboard']);
     });
 
