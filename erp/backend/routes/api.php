@@ -9,6 +9,7 @@ use App\Http\Controllers\Accounting\PettyCashItemController;
 use App\Http\Controllers\Accounting\ExpenseClaimController;
 use App\Http\Controllers\Accounting\SettlementController;
 use App\Http\Controllers\Accounting\ClosingController;
+use App\Http\Controllers\Accounting\ReportController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -119,4 +120,15 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     // إعدادات الشركة (خرائط الحسابات)
     Route::get('company-settings', [CompanySettingController::class, 'index'])->middleware('permission:settings.view');
     Route::put('company-settings', [CompanySettingController::class, 'update'])->middleware('permission:settings.edit');
+
+    // ===== المرحلة 5: التقارير المالية و Dashboard =====
+    Route::middleware('permission:reports.view')->group(function () {
+        Route::get('reports/trial-balance', [ReportController::class, 'trialBalance']);
+        Route::get('reports/income-statement', [ReportController::class, 'incomeStatement']);
+        Route::get('reports/balance-sheet', [ReportController::class, 'balanceSheet']);
+        Route::get('reports/general-ledger/{accountId}', [ReportController::class, 'generalLedger']);
+        Route::get('reports/cash-flow', [ReportController::class, 'cashFlow']);
+        Route::get('reports/claims', [ReportController::class, 'claims']);
+        Route::get('reports/dashboard', [ReportController::class, 'dashboard']);
+    });
 });

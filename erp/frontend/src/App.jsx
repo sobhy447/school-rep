@@ -6,6 +6,8 @@ import JournalEntry from './JournalEntry.jsx'
 import Vouchers from './Vouchers.jsx'
 import PettyCash from './PettyCash.jsx'
 import Settlement from './Settlement.jsx'
+import Reports from './Reports.jsx'
+import Dashboard from './Dashboard.jsx'
 
 // المرحلة 0: شاشة دخول + عرض المستخدم الحالي (إثبات الأساس يعمل).
 const T = {
@@ -82,7 +84,7 @@ export default function App() {
       {user && (
         <>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {[['settings', 'الإعدادات'], ['accounts', 'دليل الحسابات'], ['journal', 'قيد يومية'], ['vouchers', 'السندات'], ['pettycash', 'العهد'], ['settlement', 'الأمانات/السداد']].map(([k, label]) => (
+            {[['dashboard', 'المؤشرات'], ['settings', 'الإعدادات'], ['accounts', 'دليل الحسابات'], ['journal', 'قيد يومية'], ['vouchers', 'السندات'], ['pettycash', 'العهد'], ['settlement', 'الأمانات/السداد'], ['reports', 'التقارير']].map(([k, label]) => (
               <button key={k} onClick={() => setSection(k)}
                 style={{ padding: '6px 14px', border: 0, borderRadius: 6, cursor: 'pointer',
                          background: section === k ? '#1d4ed8' : '#e5e7eb', color: section === k ? '#fff' : '#111' }}>
@@ -96,6 +98,8 @@ export default function App() {
           {section === 'vouchers' && <Vouchers />}
           {section === 'pettycash' && <PettyCash />}
           {section === 'settlement' && <Settlement />}
+          {section === 'reports' && <Reports />}
+          {section === 'dashboard' && <Dashboard />}
         </>
       )}
     </div>
