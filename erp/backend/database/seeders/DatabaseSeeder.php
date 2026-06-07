@@ -49,6 +49,7 @@ class DatabaseSeeder extends Seeder
             'reminders' => ['التذكيرات', 'Reminders'],
             'audit' => ['سجل التدقيق', 'Audit Log'],
             'cheques' => ['الشيكات', 'Cheques'],
+            'returns' => ['المرتجعات', 'Returns'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {

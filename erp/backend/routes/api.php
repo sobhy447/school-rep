@@ -26,6 +26,7 @@ use App\Http\Controllers\Accounting\ReminderController;
 use App\Http\Controllers\Accounting\DocumentPdfController;
 use App\Http\Controllers\Accounting\AuditLogController;
 use App\Http\Controllers\Accounting\ChequeController;
+use App\Http\Controllers\Accounting\ReturnController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -253,4 +254,8 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::post('cheques', [ChequeController::class, 'store'])->middleware('permission:cheques.create');
     Route::post('cheques/{id}/clear', [ChequeController::class, 'clear'])->middleware('permission:cheques.edit');
     Route::post('cheques/{id}/bounce', [ChequeController::class, 'bounce'])->middleware('permission:cheques.edit');
+
+    // ===== المرحلة 16: المرتجعات =====
+    Route::get('returns', [ReturnController::class, 'index'])->middleware('permission:returns.view');
+    Route::post('returns', [ReturnController::class, 'store'])->middleware('permission:returns.create');
 });
