@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
             'reports' => ['التقارير', 'Reports'],
             'fixed_assets' => ['الأصول الثابتة', 'Fixed Assets'],
             'banks' => ['البنوك والتسويات', 'Banks & Reconciliation'],
+            'inventory' => ['المخزون', 'Inventory'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {
@@ -122,6 +123,7 @@ class DatabaseSeeder extends Seeder
             ['1102', 'البنك', 'ASSET', '11'],
             ['1103', 'العملاء', 'ASSET', '11'],
             ['1104', 'عهد الموظفين', 'ASSET', '11'],
+            ['1105', 'المخزون', 'ASSET', '11'],
             ['12', 'الأصول الثابتة', 'ASSET', '1'],
             ['1201', 'سيارات', 'ASSET', '12'],
             ['1202', 'مجمع إهلاك السيارات', 'ASSET', '12'],
@@ -137,6 +139,7 @@ class DatabaseSeeder extends Seeder
             ['5', 'المصروفات', 'EXPENSE', null],
             ['51', 'مصروفات إدارية', 'EXPENSE', '5'],
             ['52', 'مصروف الإهلاك', 'EXPENSE', '5'],
+            ['53', 'تكلفة البضاعة المباعة', 'EXPENSE', '5'],
         ];
 
         $idByCode = [];
@@ -183,6 +186,23 @@ class DatabaseSeeder extends Seeder
         \App\Models\CompanySetting::put($companyId, 'petty_cash_account_id', (string) ($idByCode['1104'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'income_summary_account_id', (string) ($idByCode['39'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'retained_earnings_account_id', (string) ($idByCode['32'] ?? ''));
+
+        // مخزون: مخزن + صنفان مرتبطان بالحسابات
+        $wh = \App\Models\Warehouse::firstOrCreate(
+            ['company_id' => $companyId, 'code' => 'WH1'],
+            ['name' => 'المخزن الرئيسي']
+        );
+        foreach ([['ITM-1', 'صنف أ', 10, 15], ['ITM-2', 'صنف ب', 20, 30]] as [$code, $name, $pp, $sp]) {
+            \App\Models\InventoryItem::firstOrCreate(
+                ['company_id' => $companyId, 'code' => $code],
+                [
+                    'name' => $name, 'purchase_price' => $pp, 'sale_price' => $sp,
+                    'inventory_account_id' => $idByCode['1105'] ?? null,
+                    'cogs_account_id' => $idByCode['53'] ?? null,
+                    'revenue_account_id' => $idByCode['41'] ?? null,
+                ]
+            );
+        }
 
         // بنود العهد (بحدود تكرار)
         foreach ([

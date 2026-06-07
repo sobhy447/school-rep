@@ -12,6 +12,9 @@ use App\Http\Controllers\Accounting\ClosingController;
 use App\Http\Controllers\Accounting\ReportController;
 use App\Http\Controllers\Accounting\FixedAssetController;
 use App\Http\Controllers\Accounting\BankReconciliationController;
+use App\Http\Controllers\Accounting\WarehouseController;
+use App\Http\Controllers\Accounting\InventoryItemController;
+use App\Http\Controllers\Accounting\StockController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -151,4 +154,23 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::post('bank-reconciliations', [BankReconciliationController::class, 'store'])->middleware('permission:banks.create');
     Route::post('bank-reconciliations/{id}/toggle', [BankReconciliationController::class, 'toggle'])->middleware('permission:banks.edit');
     Route::post('bank-reconciliations/{id}/complete', [BankReconciliationController::class, 'complete'])->middleware('permission:banks.edit');
+
+    // ===== المرحلة 8: المخزون =====
+    Route::get('warehouses', [WarehouseController::class, 'index'])->middleware('permission:inventory.view');
+    Route::post('warehouses', [WarehouseController::class, 'store'])->middleware('permission:inventory.create');
+    Route::put('warehouses/{id}', [WarehouseController::class, 'update'])->middleware('permission:inventory.edit');
+    Route::delete('warehouses/{id}', [WarehouseController::class, 'destroy'])->middleware('permission:inventory.delete');
+
+    Route::get('items', [InventoryItemController::class, 'index'])->middleware('permission:inventory.view');
+    Route::get('items/{id}', [InventoryItemController::class, 'show'])->middleware('permission:inventory.view');
+    Route::post('items', [InventoryItemController::class, 'store'])->middleware('permission:inventory.create');
+    Route::put('items/{id}', [InventoryItemController::class, 'update'])->middleware('permission:inventory.edit');
+    Route::delete('items/{id}', [InventoryItemController::class, 'destroy'])->middleware('permission:inventory.delete');
+
+    Route::get('stock/valuation', [StockController::class, 'valuation'])->middleware('permission:inventory.view');
+    Route::get('stock/item/{id}', [StockController::class, 'itemStock'])->middleware('permission:inventory.view');
+    Route::post('stock/receive', [StockController::class, 'receive'])->middleware('permission:inventory.create');
+    Route::post('stock/issue', [StockController::class, 'issue'])->middleware('permission:inventory.create');
+    Route::post('stock/transfer', [StockController::class, 'transfer'])->middleware('permission:inventory.create');
+    Route::post('stock/adjust', [StockController::class, 'adjust'])->middleware('permission:inventory.edit');
 });
