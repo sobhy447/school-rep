@@ -44,6 +44,7 @@ class DatabaseSeeder extends Seeder
             'inventory' => ['المخزون', 'Inventory'],
             'purchases' => ['المشتريات', 'Purchases'],
             'sales' => ['المبيعات', 'Sales'],
+            'hr' => ['الموارد البشرية', 'HR & Payroll'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {
@@ -133,6 +134,8 @@ class DatabaseSeeder extends Seeder
             ['2', 'الخصوم', 'LIABILITY', null],
             ['21', 'الموردون', 'LIABILITY', '2'],
             ['22', 'ضريبة المخرجات المستحقة', 'LIABILITY', '2'],
+            ['23', 'الرواتب المستحقة', 'LIABILITY', '2'],
+            ['24', 'الاستقطاعات المستحقة', 'LIABILITY', '2'],
             ['3', 'حقوق الملكية', 'EQUITY', null],
             ['31', 'رأس المال', 'EQUITY', '3'],
             ['32', 'الأرباح المحتجزة', 'EQUITY', '3'],
@@ -144,6 +147,7 @@ class DatabaseSeeder extends Seeder
             ['51', 'مصروفات إدارية', 'EXPENSE', '5'],
             ['52', 'مصروف الإهلاك', 'EXPENSE', '5'],
             ['53', 'تكلفة البضاعة المباعة', 'EXPENSE', '5'],
+            ['54', 'مصروف الرواتب', 'EXPENSE', '5'],
         ];
 
         $idByCode = [];
@@ -192,6 +196,18 @@ class DatabaseSeeder extends Seeder
         \App\Models\CompanySetting::put($companyId, 'retained_earnings_account_id', (string) ($idByCode['32'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'vat_input_account_id', (string) ($idByCode['1106'] ?? ''));
         \App\Models\CompanySetting::put($companyId, 'vat_output_account_id', (string) ($idByCode['22'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'salary_expense_account_id', (string) ($idByCode['54'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'salaries_payable_account_id', (string) ($idByCode['23'] ?? ''));
+        \App\Models\CompanySetting::put($companyId, 'deductions_payable_account_id', (string) ($idByCode['24'] ?? ''));
+
+        // موظفون تجريبيون + مكوّن بدل/استقطاع
+        $allow = \App\Models\SalaryComponent::firstOrCreate(['company_id' => $companyId, 'code' => 'HOUSING'], ['name' => 'بدل سكن', 'type' => 'EARNING', 'default_amount' => 100]);
+        $ded = \App\Models\SalaryComponent::firstOrCreate(['company_id' => $companyId, 'code' => 'GOSI'], ['name' => 'تأمينات', 'type' => 'DEDUCTION', 'default_amount' => 50]);
+        foreach ([['EMP-1', 'موظف أول', 500], ['EMP-2', 'موظف ثاني', 700]] as [$code, $name, $basic]) {
+            $emp = \App\Models\Employee::firstOrCreate(['company_id' => $companyId, 'code' => $code], ['name' => $name, 'basic_salary' => $basic, 'hire_date' => '2026-01-01']);
+            $emp->components()->firstOrCreate(['company_id' => $companyId, 'component_id' => $allow->id], ['amount' => 100]);
+            $emp->components()->firstOrCreate(['company_id' => $companyId, 'component_id' => $ded->id], ['amount' => 50]);
+        }
 
         // مخزون: مخزن + صنفان مرتبطان بالحسابات
         $wh = \App\Models\Warehouse::firstOrCreate(

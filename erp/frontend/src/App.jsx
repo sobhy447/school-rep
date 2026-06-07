@@ -12,6 +12,7 @@ import FixedAssets from './FixedAssets.jsx'
 import Banks from './Banks.jsx'
 import Inventory from './Inventory.jsx'
 import { Purchases, Sales } from './Trade.jsx'
+import Hr from './Hr.jsx'
 
 // مجموعات قائمة التنقّل
 const NAV = [
@@ -29,6 +30,7 @@ const NAV = [
     ['inventory', 'المخزون', '📦'],
     ['purchases', 'المشتريات', '🛒'],
     ['sales', 'المبيعات', '🧾'],
+    ['hr', 'الموارد البشرية', '👥'],
   ] },
   { group: 'التقارير', items: [['reports', 'التقارير', '📑']] },
   { group: 'النظام', items: [['settings', 'الإعدادات', '⚙️']] },
@@ -37,7 +39,7 @@ const NAV = [
 const SCREENS = { dashboard: Dashboard, accounts: Accounts, journal: JournalEntry,
   vouchers: Vouchers, pettycash: PettyCash, settlement: Settlement, reports: Reports,
   settings: Settings, assets: FixedAssets, banks: Banks, inventory: Inventory,
-  purchases: Purchases, sales: Sales }
+  purchases: Purchases, sales: Sales, hr: Hr }
 
 const TITLES = Object.fromEntries(NAV.flatMap((g) => g.items.map(([k, label]) => [k, label])))
 

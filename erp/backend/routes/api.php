@@ -17,6 +17,9 @@ use App\Http\Controllers\Accounting\InventoryItemController;
 use App\Http\Controllers\Accounting\StockController;
 use App\Http\Controllers\Accounting\PurchaseInvoiceController;
 use App\Http\Controllers\Accounting\SalesInvoiceController;
+use App\Http\Controllers\Accounting\EmployeeController;
+use App\Http\Controllers\Accounting\SalaryComponentController;
+use App\Http\Controllers\Accounting\PayrollController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -187,4 +190,22 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::get('sales-invoices/{id}', [SalesInvoiceController::class, 'show'])->middleware('permission:sales.view');
     Route::post('sales-invoices', [SalesInvoiceController::class, 'store'])->middleware('permission:sales.create');
     Route::post('sales-invoices/{id}/post', [SalesInvoiceController::class, 'post'])->middleware('permission:sales.post');
+
+    // ===== المرحلة 10: الموارد البشرية والرواتب =====
+    Route::get('salary-components', [SalaryComponentController::class, 'index'])->middleware('permission:hr.view');
+    Route::post('salary-components', [SalaryComponentController::class, 'store'])->middleware('permission:hr.create');
+    Route::put('salary-components/{id}', [SalaryComponentController::class, 'update'])->middleware('permission:hr.edit');
+    Route::delete('salary-components/{id}', [SalaryComponentController::class, 'destroy'])->middleware('permission:hr.delete');
+
+    Route::get('employees', [EmployeeController::class, 'index'])->middleware('permission:hr.view');
+    Route::get('employees/{id}', [EmployeeController::class, 'show'])->middleware('permission:hr.view');
+    Route::post('employees', [EmployeeController::class, 'store'])->middleware('permission:hr.create');
+    Route::put('employees/{id}', [EmployeeController::class, 'update'])->middleware('permission:hr.edit');
+    Route::delete('employees/{id}', [EmployeeController::class, 'destroy'])->middleware('permission:hr.delete');
+    Route::post('employees/{id}/components', [EmployeeController::class, 'setComponents'])->middleware('permission:hr.edit');
+
+    Route::get('payroll', [PayrollController::class, 'index'])->middleware('permission:hr.view');
+    Route::get('payroll/{id}', [PayrollController::class, 'show'])->middleware('permission:hr.view');
+    Route::post('payroll/generate', [PayrollController::class, 'generate'])->middleware('permission:hr.create');
+    Route::post('payroll/{id}/post', [PayrollController::class, 'post'])->middleware('permission:hr.post');
 });
