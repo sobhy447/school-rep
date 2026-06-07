@@ -6,7 +6,10 @@
 ## الحالة
 - ✅ **المرحلة 0 — التأسيس:** Laravel 13 + Sanctum + عزل مستأجر (Global Scope) + RBAC
   (أدوار/صلاحيات) + تسجيل دخول يُرجِع Token + واجهة React (دخول + /me) + Docker Compose.
-  **الاختبارات:** 9 ناجحة (مصادقة + عزل مستأجر).
+- ✅ **المرحلة 1 — الإعدادات الأساسية:** CRUD كامل (معزول بالمستأجر + محمي بالصلاحيات)
+  للفروع، السنوات المالية (+إقفال/فتح)، العملات (عملة أساسية واحدة)، مراكز التكلفة،
+  أنواع السندات، الضرائب (معطّلة افتراضياً) + شاشات React + بيانات تجريبية.
+- **الاختبارات:** 22 ناجحة (مصادقة + عزل مستأجر + CRUD + تحقّقات + صلاحيات).
 
 ## التشغيل عبر Docker
 ```bash
@@ -43,6 +46,19 @@ npm install && npm run dev         # http://localhost:3000
 | POST | `/api/login` | تسجيل الدخول → Token |
 | GET | `/api/me` | المستخدم الحالي + صلاحياته (محمي) |
 | POST | `/api/logout` | إلغاء التوكن الحالي (محمي) |
+
+### الإعدادات (المرحلة 1) — كلها تحت `/api/settings`
+لكل كيان CRUD قياسي: `GET` (قائمة) · `GET/{id}` · `POST` · `PUT/{id}` · `DELETE/{id}`،
+محمي بصلاحيات `settings.view/create/edit/delete`.
+
+| الكيان | المسار |
+|--------|--------|
+| الفروع | `/api/settings/branches` |
+| السنوات المالية | `/api/settings/fiscal-years` (+ `POST .../{id}/lock` و`/unlock`) |
+| العملات | `/api/settings/currencies` |
+| مراكز التكلفة | `/api/settings/cost-centers` |
+| أنواع السندات | `/api/settings/voucher-types` |
+| الضرائب | `/api/settings/tax-rates` |
 
 ## المعمارية
 - **عزل المستأجر:** `App\Models\Concerns\BelongsToCompany` (Global Scope + ضبط `company_id`

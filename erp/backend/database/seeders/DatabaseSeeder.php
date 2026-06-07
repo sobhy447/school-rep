@@ -2,10 +2,16 @@
 
 namespace Database\Seeders;
 
+use App\Models\Branch;
 use App\Models\Company;
+use App\Models\CostCenter;
+use App\Models\Currency;
+use App\Models\FiscalYear;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\TaxRate;
 use App\Models\User;
+use App\Models\VoucherType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -83,6 +89,54 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'is_active' => true,
             ]
+        );
+
+        $this->seedSettings($company->id);
+    }
+
+    /** بيانات إعدادات تجريبية لكل شركة. */
+    private function seedSettings(int $companyId): void
+    {
+        Branch::firstOrCreate(
+            ['company_id' => $companyId, 'code' => 'MAIN'],
+            ['name' => 'الفرع الرئيسي', 'name_en' => 'Main Branch', 'is_main' => true]
+        );
+
+        FiscalYear::firstOrCreate(
+            ['company_id' => $companyId, 'name' => '2026'],
+            ['start_date' => '2026-01-01', 'end_date' => '2026-12-31', 'status' => 'OPEN']
+        );
+
+        Currency::firstOrCreate(
+            ['company_id' => $companyId, 'code' => 'KWD'],
+            ['name' => 'دينار كويتي', 'name_en' => 'Kuwaiti Dinar', 'symbol' => 'د.ك', 'is_base' => true, 'exchange_rate' => 1]
+        );
+        Currency::firstOrCreate(
+            ['company_id' => $companyId, 'code' => 'USD'],
+            ['name' => 'دولار أمريكي', 'name_en' => 'US Dollar', 'symbol' => '$', 'is_base' => false, 'exchange_rate' => 0.307]
+        );
+
+        foreach ([['ADMIN', 'الإدارة'], ['SALES', 'المبيعات']] as [$code, $name]) {
+            CostCenter::firstOrCreate(
+                ['company_id' => $companyId, 'code' => $code],
+                ['name' => $name]
+            );
+        }
+
+        foreach ([
+            ['REC', 'سند قبض', 'RECEIPT', 'Q'],
+            ['PAY', 'سند صرف', 'PAYMENT', 'P'],
+            ['TRF', 'سند تحويل', 'TRANSFER', 'T'],
+        ] as [$code, $name, $dir, $prefix]) {
+            VoucherType::firstOrCreate(
+                ['company_id' => $companyId, 'code' => $code],
+                ['name' => $name, 'direction' => $dir, 'prefix' => $prefix]
+            );
+        }
+
+        TaxRate::firstOrCreate(
+            ['company_id' => $companyId, 'code' => 'VAT0'],
+            ['name' => 'ضريبة القيمة المضافة', 'name_en' => 'VAT', 'rate' => 0, 'type' => 'VAT', 'is_enabled' => false]
         );
     }
 

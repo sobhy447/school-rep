@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from './api.js'
+import Settings from './Settings.jsx'
 
 // المرحلة 0: شاشة دخول + عرض المستخدم الحالي (إثبات الأساس يعمل).
 const T = {
@@ -67,13 +68,12 @@ export default function App() {
         ) : (
           <div style={{ marginTop: 20 }}>
             <h3>{t.welcome} {user.name}</h3>
-            <p>{t.company}: {user.company?.name}</p>
-            <p>{t.role}: {user.role?.name}</p>
-            <p>{t.perms}: {user.permissions?.length}</p>
+            <p>{t.company}: {user.company?.name} — {t.role}: {user.role?.name} — {t.perms}: {user.permissions?.length}</p>
             <button onClick={logout}>{t.logout}</button>
           </div>
         )}
       </div>
+      {user && <Settings />}
     </div>
   )
 }
