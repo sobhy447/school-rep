@@ -24,6 +24,7 @@ use App\Http\Controllers\Accounting\PosController;
 use App\Http\Controllers\Accounting\AttachmentController;
 use App\Http\Controllers\Accounting\ReminderController;
 use App\Http\Controllers\Accounting\DocumentPdfController;
+use App\Http\Controllers\Accounting\AuditLogController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -241,4 +242,7 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::get('purchase-invoices/{id}/pdf', [DocumentPdfController::class, 'purchaseInvoice'])->middleware('permission:purchases.view');
     Route::get('journal-entries/{id}/pdf', [DocumentPdfController::class, 'journalEntry'])->middleware('permission:journals.view');
     Route::get('accounts/{id}/statement/pdf', [DocumentPdfController::class, 'statement'])->middleware('permission:accounts.view');
+
+    // ===== المرحلة 14: سجل التدقيق =====
+    Route::get('audit-logs', [AuditLogController::class, 'index'])->middleware('permission:audit.view');
 });

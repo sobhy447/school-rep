@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use App\Models\Concerns\BelongsToCompany;
 use App\Support\AccountType;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Account extends Model
 {
-    use BelongsToCompany, SoftDeletes;
+    use Auditable, BelongsToCompany, SoftDeletes;
 
     protected $fillable = [
         'company_id', 'parent_id', 'code', 'name', 'name_en', 'type', 'is_cash_or_bank', 'party_type',

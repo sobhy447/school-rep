@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\Auditable;
 use App\Models\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class JournalEntry extends Model
 {
-    use BelongsToCompany, SoftDeletes;
+    use Auditable, BelongsToCompany, SoftDeletes;
 
     protected $fillable = [
         'company_id', 'fiscal_year_id', 'branch_id', 'voucher_type_id', 'type',

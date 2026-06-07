@@ -47,6 +47,7 @@ class DatabaseSeeder extends Seeder
             'hr' => ['الموارد البشرية', 'HR & Payroll'],
             'pos' => ['نقاط البيع', 'Point of Sale'],
             'reminders' => ['التذكيرات', 'Reminders'],
+            'audit' => ['سجل التدقيق', 'Audit Log'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {

@@ -15,6 +15,7 @@ import { Purchases, Sales } from './Trade.jsx'
 import Hr from './Hr.jsx'
 import Pos from './Pos.jsx'
 import Reminders from './Reminders.jsx'
+import Audit from './Audit.jsx'
 
 // مجموعات قائمة التنقّل
 const NAV = [
@@ -36,13 +37,13 @@ const NAV = [
     ['pos', 'نقطة البيع', '🛍️'],
   ] },
   { group: 'التقارير', items: [['reports', 'التقارير', '📑']] },
-  { group: 'النظام', items: [['reminders', 'التذكيرات', '🔔'], ['settings', 'الإعدادات', '⚙️']] },
+  { group: 'النظام', items: [['reminders', 'التذكيرات', '🔔'], ['audit', 'سجل التدقيق', '🛡️'], ['settings', 'الإعدادات', '⚙️']] },
 ]
 
 const SCREENS = { dashboard: Dashboard, accounts: Accounts, journal: JournalEntry,
   vouchers: Vouchers, pettycash: PettyCash, settlement: Settlement, reports: Reports,
   settings: Settings, assets: FixedAssets, banks: Banks, inventory: Inventory,
-  purchases: Purchases, sales: Sales, hr: Hr, pos: Pos, reminders: Reminders }
+  purchases: Purchases, sales: Sales, hr: Hr, pos: Pos, reminders: Reminders, audit: Audit }
 
 const TITLES = Object.fromEntries(NAV.flatMap((g) => g.items.map(([k, label, ico]) => [k, { label, ico }])))
 
@@ -55,7 +56,7 @@ const DESC = {
   inventory: 'الأصناف والمخازن وحركة المخزون', purchases: 'فواتير الموردين',
   sales: 'فواتير العملاء', hr: 'الموظفون ومسير الرواتب', pos: 'البيع النقدي السريع',
   reports: 'القوائم المالية والتقارير', settings: 'إعدادات النظام الأساسية',
-  reminders: 'تنبيهات الاستحقاقات وإعادة الطلب',
+  reminders: 'تنبيهات الاستحقاقات وإعادة الطلب', audit: 'سجل كل العمليات الحساسة',
 }
 
 export default function App() {
