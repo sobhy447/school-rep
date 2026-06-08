@@ -29,6 +29,15 @@ export default function Banks() {
     const r = await api.post(`/bank-reconciliations/${id}/toggle`, { line_id: lineId, cleared })
     setView(r.data.data)
   }
+  const importCsv = async (ev) => {
+    const file = ev.target.files[0]; if (!file) return
+    setErr(null); setMsg(null)
+    try {
+      const fd = new FormData(); fd.append('file', file)
+      const r = await api.post(`/bank-reconciliations/${view.reconciliation.id}/import-statement`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      setView(r.data.data); setMsg(r.data.message)
+    } catch (e) { setErr(e.response?.data?.message || 'تعذّر الاستيراد') }
+  }
   const complete = async () => {
     setErr(null); setMsg(null)
     try { const r = await api.post(`/bank-reconciliations/${view.reconciliation.id}/complete`); setView(r.data.data); setMsg('تمت التسوية'); reload() }
@@ -60,6 +69,12 @@ export default function Banks() {
             {view.reconciliation.status === 'COMPLETED'
               ? <span className="badge badge-green">مكتملة ✓</span>
               : <button className="btn-success btn-sm" onClick={complete} disabled={!view.is_reconciled}>إتمام التسوية</button>}
+            {view.reconciliation.status !== 'COMPLETED' && (
+              <label className="btn btn-sm" style={{ cursor: 'pointer' }}>
+                ⬆ استيراد كشف CSV
+                <input type="file" accept=".csv" style={{ display: 'none' }} onChange={importCsv} />
+              </label>
+            )}
           </div>
           <table>
             <thead><tr><th>تأشير</th><th>القيد</th><th>التاريخ</th><th>البيان</th><th>مدين</th><th>دائن</th></tr></thead>

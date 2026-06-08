@@ -99,6 +99,37 @@ class BankReconciliationService
         ];
     }
 
+    /**
+     * استيراد كشف بنك (صفوف: amount موجب=إيداع/سالب=سحب) ومطابقتها تلقائياً بالحركات غير المؤشّرة.
+     * @return array{matched:int, view:array}
+     */
+    public function importStatement(BankReconciliation $rec, array $rows): array
+    {
+        $account = $rec->account;
+        $lines = BankReconciliationLine::query()->where('reconciliation_id', $rec->id)->where('is_cleared', false)
+            ->with('journalLine')->get();
+
+        $matched = 0;
+        foreach ($rows as $row) {
+            $amount = round((float) ($row['amount'] ?? 0), 3);
+            if (abs($amount) < 0.0005) {
+                continue;
+            }
+            foreach ($lines as $rl) {
+                if ($rl->is_cleared || ! $rl->journalLine) {
+                    continue;
+                }
+                $signed = \App\Support\AccountType::signedBalance($account->type, (float) $rl->journalLine->debit, (float) $rl->journalLine->credit);
+                if (abs($signed - $amount) < 0.0005) {
+                    $rl->update(['is_cleared' => true]);
+                    $matched++;
+                    break;
+                }
+            }
+        }
+        return ['matched' => $matched, 'view' => $this->view($rec->fresh())];
+    }
+
     /** تبديل حالة تأشير حركة. */
     public function toggle(BankReconciliation $rec, int $lineId, bool $cleared): array
     {

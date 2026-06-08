@@ -50,6 +50,7 @@ class DatabaseSeeder extends Seeder
             'audit' => ['سجل التدقيق', 'Audit Log'],
             'cheques' => ['الشيكات', 'Cheques'],
             'returns' => ['المرتجعات', 'Returns'],
+            'users' => ['المستخدمون والأدوار', 'Users & Roles'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {
@@ -101,6 +102,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'مدير النظام',
                 'password' => Hash::make('password'),
                 'is_active' => true,
+                'is_super' => $code === 'NOOR',
             ]
         );
 

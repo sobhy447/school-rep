@@ -27,6 +27,9 @@ use App\Http\Controllers\Accounting\DocumentPdfController;
 use App\Http\Controllers\Accounting\AuditLogController;
 use App\Http\Controllers\Accounting\ChequeController;
 use App\Http\Controllers\Accounting\ReturnController;
+use App\Http\Controllers\Settings\UserController;
+use App\Http\Controllers\Settings\RoleController;
+use App\Http\Controllers\Settings\CompanyController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -167,6 +170,7 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::get('bank-reconciliations/{id}', [BankReconciliationController::class, 'show'])->middleware('permission:banks.view');
     Route::post('bank-reconciliations', [BankReconciliationController::class, 'store'])->middleware('permission:banks.create');
     Route::post('bank-reconciliations/{id}/toggle', [BankReconciliationController::class, 'toggle'])->middleware('permission:banks.edit');
+    Route::post('bank-reconciliations/{id}/import-statement', [BankReconciliationController::class, 'importStatement'])->middleware('permission:banks.edit');
     Route::post('bank-reconciliations/{id}/complete', [BankReconciliationController::class, 'complete'])->middleware('permission:banks.edit');
 
     // ===== المرحلة 8: المخزون =====
@@ -254,6 +258,25 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     Route::post('cheques', [ChequeController::class, 'store'])->middleware('permission:cheques.create');
     Route::post('cheques/{id}/clear', [ChequeController::class, 'clear'])->middleware('permission:cheques.edit');
     Route::post('cheques/{id}/bounce', [ChequeController::class, 'bounce'])->middleware('permission:cheques.edit');
+
+    // ===== إدارة المستخدمين والأدوار =====
+    Route::get('users', [UserController::class, 'index'])->middleware('permission:users.view');
+    Route::post('users', [UserController::class, 'store'])->middleware('permission:users.create');
+    Route::put('users/{id}', [UserController::class, 'update'])->middleware('permission:users.edit');
+    Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('permission:users.delete');
+    Route::get('roles', [RoleController::class, 'index'])->middleware('permission:users.view');
+    Route::get('roles/permissions', [RoleController::class, 'permissions'])->middleware('permission:users.view');
+    Route::get('roles/{id}', [RoleController::class, 'show'])->middleware('permission:users.view');
+    Route::post('roles', [RoleController::class, 'store'])->middleware('permission:users.create');
+    Route::put('roles/{id}', [RoleController::class, 'update'])->middleware('permission:users.edit');
+    Route::delete('roles/{id}', [RoleController::class, 'destroy'])->middleware('permission:users.delete');
+
+    // ===== الشركات والتبديل =====
+    Route::get('company', [CompanyController::class, 'current'])->middleware('permission:settings.view');
+    Route::put('company', [CompanyController::class, 'update'])->middleware('permission:settings.edit');
+    Route::get('companies', [CompanyController::class, 'index']);
+    Route::post('companies', [CompanyController::class, 'store']);
+    Route::post('companies/{id}/switch', [CompanyController::class, 'switch']);
 
     // ===== المرحلة 16: المرتجعات =====
     Route::get('returns', [ReturnController::class, 'index'])->middleware('permission:returns.view');

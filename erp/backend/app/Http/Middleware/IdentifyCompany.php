@@ -16,8 +16,12 @@ class IdentifyCompany
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if ($user && $user->company_id) {
-            TenantContext::set((int) $user->company_id);
+        if ($user) {
+            // المستخدم الخارق يمكنه العمل ضمن شركة نشطة مختارة؛ غيره مقيّد بشركته.
+            $companyId = ($user->is_super && $user->active_company_id) ? (int) $user->active_company_id : (int) $user->company_id;
+            if ($companyId) {
+                TenantContext::set($companyId);
+            }
         }
 
         return $next($request);

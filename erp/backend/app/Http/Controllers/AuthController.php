@@ -69,16 +69,19 @@ class AuthController extends Controller
     private function userPayload(User $user): array
     {
         $user->loadMissing('role', 'company');
+        $activeId = ($user->is_super && $user->active_company_id) ? $user->active_company_id : $user->company_id;
+        $activeCompany = \App\Models\Company::find($activeId);
 
         return [
             'id' => $user->id,
             'name' => $user->name,
             'name_en' => $user->name_en,
             'email' => $user->email,
-            'company' => $user->company ? [
-                'id' => $user->company->id,
-                'name' => $user->company->name,
-                'currency_code' => $user->company->currency_code,
+            'is_super' => (bool) $user->is_super,
+            'company' => $activeCompany ? [
+                'id' => $activeCompany->id,
+                'name' => $activeCompany->name,
+                'currency_code' => $activeCompany->currency_code,
             ] : null,
             'role' => $user->role ? [
                 'id' => $user->role->id,
