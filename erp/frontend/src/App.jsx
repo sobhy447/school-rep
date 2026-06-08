@@ -75,6 +75,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [remCount, setRemCount] = useState(0)
   const [dark, setDark] = useState(localStorage.getItem('theme') === 'dark')
+  const [navOpen, setNavOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'
@@ -106,14 +107,31 @@ export default function App() {
   if (!user) {
     return (
       <div className="login-wrap">
-        <form className="login-card" onSubmit={login}>
-          <div className="brand"><span className="logo">📒</span> نظام المحاسبة</div>
-          <p className="muted" style={{ textAlign: 'center', marginTop: -6, marginBottom: 22 }}>سجّل الدخول للمتابعة</p>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="البريد الإلكتروني" />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="كلمة المرور" />
-          <button className="btn-primary" type="submit" disabled={loading}>{loading ? '...' : 'دخول'}</button>
-          {error && <p className="err" style={{ textAlign: 'center', marginTop: 12 }}>{error}</p>}
-        </form>
+        <div className="login-aside">
+          <div className="la-brand"><span className="la-logo">📒</span> نظام المحاسبة</div>
+          <div>
+            <h1>محاسبة متكاملة<br />بثقة واحترافية.</h1>
+            <p className="la-sub">نظام ERP محاسبي شامل لإدارة الحسابات والمبيعات والمخزون والرواتب — بقيود تلقائية متوازنة وتقارير لحظية.</p>
+            <div className="la-feats">
+              {[['🔒', 'عزل كامل لبيانات كل شركة'], ['⚖️', 'قيد مزدوج متوازن لكل عملية'], ['📊', 'قوائم مالية وتقارير فورية']].map(([i, t]) => (
+                <div className="la-feat" key={t}><span className="dot">{i}</span> {t}</div>
+              ))}
+            </div>
+          </div>
+          <div className="la-foot">© {new Date().getFullYear()} — جميع الحقوق محفوظة</div>
+        </div>
+        <div className="login-main">
+          <form className="login-card" onSubmit={login}>
+            <h2>تسجيل الدخول</h2>
+            <p className="muted" style={{ marginTop: -4, marginBottom: 22 }}>أدخل بياناتك للمتابعة إلى لوحة التحكم</p>
+            <div className="field"><label>البريد الإلكتروني</label>
+              <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@company.com" autoComplete="username" /></div>
+            <div className="field"><label>كلمة المرور</label>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" /></div>
+            <button className="btn-primary" type="submit" disabled={loading}>{loading ? 'جارٍ الدخول…' : 'دخول →'}</button>
+            {error && <p className="err" style={{ textAlign: 'center', marginTop: 12 }}>{error}</p>}
+          </form>
+        </div>
       </div>
     )
   }
@@ -122,16 +140,19 @@ export default function App() {
   const initial = (user.name || '?').trim().charAt(0)
   const meta = TITLES[section]
 
+  const go = (k) => { setSection(k); setNavOpen(false) }
+
   return (
-    <div className="app" data-module={section}>
+    <div className={`app ${navOpen ? 'nav-open' : ''}`} data-module={section}>
+      {navOpen && <div className="scrim" onClick={() => setNavOpen(false)} />}
       <aside className="sidebar">
         <div className="brand"><span className="logo">📒</span> نظام المحاسبة</div>
         {NAV.map((g) => (
           <div key={g.group}>
             <div className="nav-group">{g.group}</div>
             {g.items.map(([k, label, ico]) => (
-              <button key={k} className={`nav-item ${section === k ? 'active' : ''}`} onClick={() => setSection(k)}>
-                <span className="ico">{ico}</span> {label}
+              <button key={k} className={`nav-item ${section === k ? 'active' : ''}`} onClick={() => go(k)} aria-current={section === k ? 'page' : undefined}>
+                <span className="ico" aria-hidden="true">{ico}</span> {label}
               </button>
             ))}
           </div>
@@ -140,10 +161,13 @@ export default function App() {
 
       <div className="main">
         <header className="topbar">
-          <div className="title">{meta.label}</div>
+          <div className="row" style={{ gap: 10 }}>
+            <button className="menu-btn" onClick={() => setNavOpen(true)} aria-label="فتح القائمة">☰</button>
+            <div className="title">{meta.label}</div>
+          </div>
           <div className="right">
-            <button className="btn-ghost" onClick={() => setDark(!dark)} title="الوضع الليلي" style={{ fontSize: 18 }}>{dark ? '☀️' : '🌙'}</button>
-            <button className="btn-ghost" onClick={() => setSection('reminders')} title="التذكيرات"
+            <button className="btn-ghost" onClick={() => setDark(!dark)} aria-label="تبديل الوضع الليلي" title="الوضع الليلي" style={{ fontSize: 18 }}>{dark ? '☀️' : '🌙'}</button>
+            <button className="btn-ghost" onClick={() => setSection('reminders')} aria-label="التذكيرات" title="التذكيرات"
               style={{ position: 'relative', fontSize: 18 }}>
               🔔
               {remCount > 0 && <span style={{ position: 'absolute', top: -2, insetInlineEnd: -2, background: '#ef4444', color: '#fff', borderRadius: 999, fontSize: 10, fontWeight: 700, minWidth: 16, height: 16, display: 'grid', placeItems: 'center', padding: '0 3px' }}>{remCount}</span>}
