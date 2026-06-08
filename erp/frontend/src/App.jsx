@@ -21,6 +21,7 @@ import Returns from './Returns.jsx'
 import Admin from './Admin.jsx'
 import PostingMap from './PostingMap.jsx'
 import Budgets from './Budgets.jsx'
+import Toaster from './Toaster.jsx'
 
 // مجموعات قائمة التنقّل
 const NAV = [
@@ -107,6 +108,7 @@ export default function App() {
   if (!user) {
     return (
       <div className="login-wrap">
+        <Toaster />
         <div className="login-aside">
           <div className="la-brand"><span className="la-logo">📒</span> نظام المحاسبة</div>
           <div>
@@ -144,6 +146,7 @@ export default function App() {
 
   return (
     <div className={`app ${navOpen ? 'nav-open' : ''}`} data-module={section}>
+      <Toaster />
       {navOpen && <div className="scrim" onClick={() => setNavOpen(false)} />}
       <aside className="sidebar">
         <div className="brand"><span className="logo">📒</span> نظام المحاسبة</div>
