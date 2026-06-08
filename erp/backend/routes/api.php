@@ -30,6 +30,7 @@ use App\Http\Controllers\Accounting\ReturnController;
 use App\Http\Controllers\Settings\UserController;
 use App\Http\Controllers\Settings\RoleController;
 use App\Http\Controllers\Settings\CompanyController;
+use App\Http\Controllers\Accounting\BudgetController;
 use App\Http\Controllers\Settings\BranchController;
 use App\Http\Controllers\Settings\CompanySettingController;
 use App\Http\Controllers\Settings\CostCenterController;
@@ -151,6 +152,8 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
         Route::get('reports/claims', [ReportController::class, 'claims']);
         Route::get('reports/aging', [ReportController::class, 'aging']);
         Route::get('reports/vat', [ReportController::class, 'vat']);
+        Route::get('reports/monthly-trend', [ReportController::class, 'monthlyTrend']);
+        Route::get('reports/budget', [BudgetController::class, 'report']);
         Route::get('reports/dashboard', [ReportController::class, 'dashboard']);
     });
 
@@ -281,4 +284,8 @@ Route::middleware(['auth:sanctum', 'company'])->group(function () {
     // ===== المرحلة 16: المرتجعات =====
     Route::get('returns', [ReturnController::class, 'index'])->middleware('permission:returns.view');
     Route::post('returns', [ReturnController::class, 'store'])->middleware('permission:returns.create');
+
+    // ===== الموازنات التقديرية =====
+    Route::get('budgets', [BudgetController::class, 'index'])->middleware('permission:budgets.view');
+    Route::post('budgets', [BudgetController::class, 'upsert'])->middleware('permission:budgets.create');
 });

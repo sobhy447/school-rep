@@ -324,6 +324,35 @@ class ReportService
         return ['party_type' => $partyType, 'as_of' => $asOf->toDateString(), 'rows' => $rows, 'totals' => $totals];
     }
 
+    /** اتجاه شهري للإيرادات والمصروفات خلال سنة (للرسوم البيانية). */
+    public function monthlyTrend(?int $year = null): array
+    {
+        $companyId = TenantContext::id();
+        $year = $year ?: (int) date('Y');
+        $leaf = $this->leafAccounts($companyId)->keyBy('id');
+        $revIds = $leaf->where('type', AccountType::REVENUE)->keys()->all();
+        $expIds = $leaf->where('type', AccountType::EXPENSE)->keys()->all();
+
+        $lines = JournalLine::query()->where('company_id', $companyId)
+            ->whereIn('account_id', array_merge($revIds, $expIds))
+            ->whereHas('journalEntry', fn ($q) => $q->where('status', 'POSTED')->whereYear('entry_date', $year))
+            ->with('journalEntry:id,entry_date')->get();
+
+        $months = [];
+        for ($i = 1; $i <= 12; $i++) { $months[$i] = ['month' => $i, 'revenue' => 0.0, 'expense' => 0.0]; }
+        foreach ($lines as $l) {
+            $m = (int) optional($l->journalEntry?->entry_date)->format('n');
+            if (! $m) continue;
+            if (in_array($l->account_id, $revIds, true)) {
+                $months[$m]['revenue'] += ((float) $l->credit - (float) $l->debit);
+            } elseif (in_array($l->account_id, $expIds, true)) {
+                $months[$m]['expense'] += ((float) $l->debit - (float) $l->credit);
+            }
+        }
+        foreach ($months as &$mo) { $mo['revenue'] = round($mo['revenue'], 3); $mo['expense'] = round($mo['expense'], 3); }
+        return ['year' => $year, 'months' => array_values($months)];
+    }
+
     /** لوحة المؤشرات. */
     public function dashboard(): array
     {

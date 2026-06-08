@@ -71,6 +71,11 @@ class ReportController extends Controller
         return $this->ok($this->service->vatReport($from, $to));
     }
 
+    public function monthlyTrend(Request $r): JsonResponse
+    {
+        return $this->ok($this->service->monthlyTrend($r->query('year') ? (int) $r->query('year') : null));
+    }
+
     public function dashboard(): JsonResponse
     {
         return $this->ok($this->service->dashboard());

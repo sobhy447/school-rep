@@ -51,6 +51,7 @@ class DatabaseSeeder extends Seeder
             'cheques' => ['الشيكات', 'Cheques'],
             'returns' => ['المرتجعات', 'Returns'],
             'users' => ['المستخدمون والأدوار', 'Users & Roles'],
+            'budgets' => ['الموازنات التقديرية', 'Budgets'],
         ];
 
         foreach ($modules as $module => [$ar, $en]) {

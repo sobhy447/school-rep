@@ -20,6 +20,7 @@ import Cheques from './Cheques.jsx'
 import Returns from './Returns.jsx'
 import Admin from './Admin.jsx'
 import PostingMap from './PostingMap.jsx'
+import Budgets from './Budgets.jsx'
 
 // مجموعات قائمة التنقّل
 const NAV = [
@@ -42,14 +43,14 @@ const NAV = [
     ['hr', 'الموارد البشرية', '👥'],
     ['pos', 'نقطة البيع', '🛍️'],
   ] },
-  { group: 'التقارير', items: [['reports', 'التقارير', '📑']] },
+  { group: 'التقارير', items: [['reports', 'التقارير', '📑'], ['budgets', 'الموازنات', '🎯']] },
   { group: 'النظام', items: [['admin', 'المستخدمون والشركة', '👤'], ['postingmap', 'خرائط الترحيل', '🔗'], ['reminders', 'التذكيرات', '🔔'], ['audit', 'سجل التدقيق', '🛡️'], ['settings', 'الإعدادات', '⚙️']] },
 ]
 
 const SCREENS = { dashboard: Dashboard, accounts: Accounts, journal: JournalEntry,
   vouchers: Vouchers, pettycash: PettyCash, settlement: Settlement, reports: Reports,
   settings: Settings, assets: FixedAssets, banks: Banks, inventory: Inventory,
-  purchases: Purchases, sales: Sales, hr: Hr, pos: Pos, reminders: Reminders, audit: Audit, cheques: Cheques, returns: Returns, admin: Admin, postingmap: PostingMap }
+  purchases: Purchases, sales: Sales, hr: Hr, pos: Pos, reminders: Reminders, audit: Audit, cheques: Cheques, returns: Returns, admin: Admin, postingmap: PostingMap, budgets: Budgets }
 
 const TITLES = Object.fromEntries(NAV.flatMap((g) => g.items.map(([k, label, ico]) => [k, { label, ico }])))
 
@@ -62,7 +63,7 @@ const DESC = {
   inventory: 'الأصناف والمخازن وحركة المخزون', purchases: 'فواتير الموردين',
   sales: 'فواتير العملاء', hr: 'الموظفون ومسير الرواتب', pos: 'البيع النقدي السريع',
   reports: 'القوائم المالية والتقارير', settings: 'إعدادات النظام الأساسية',
-  reminders: 'تنبيهات الاستحقاقات وإعادة الطلب', audit: 'سجل كل العمليات الحساسة', cheques: 'الشيكات الواردة والصادرة', returns: 'مرتجعات المبيعات والمشتريات', admin: 'إدارة المستخدمين والأدوار والشركة', postingmap: 'ربط العمليات بالحسابات المحاسبية',
+  reminders: 'تنبيهات الاستحقاقات وإعادة الطلب', audit: 'سجل كل العمليات الحساسة', cheques: 'الشيكات الواردة والصادرة', returns: 'مرتجعات المبيعات والمشتريات', admin: 'إدارة المستخدمين والأدوار والشركة', postingmap: 'ربط العمليات بالحسابات المحاسبية', budgets: 'الموازنات التقديرية مقابل الفعلي',
 }
 
 export default function App() {
@@ -73,11 +74,17 @@ export default function App() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [remCount, setRemCount] = useState(0)
+  const [dark, setDark] = useState(localStorage.getItem('theme') === 'dark')
 
   useEffect(() => {
     document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'
     if (localStorage.getItem('token')) api.get('/me').then((r) => setUser(r.data.data)).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+    localStorage.setItem('theme', dark ? 'dark' : 'light')
+  }, [dark])
 
   useEffect(() => {
     if (!user) return
@@ -135,6 +142,7 @@ export default function App() {
         <header className="topbar">
           <div className="title">{meta.label}</div>
           <div className="right">
+            <button className="btn-ghost" onClick={() => setDark(!dark)} title="الوضع الليلي" style={{ fontSize: 18 }}>{dark ? '☀️' : '🌙'}</button>
             <button className="btn-ghost" onClick={() => setSection('reminders')} title="التذكيرات"
               style={{ position: 'relative', fontSize: 18 }}>
               🔔

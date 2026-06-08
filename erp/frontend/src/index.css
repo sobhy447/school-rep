@@ -33,6 +33,17 @@
 .app[data-module="reports"]    { --accent:#0d9488; --accent-soft:#ccfbf1; --accent-ink:#0f766e; }
 .app[data-module="settings"]   { --accent:#475569; --accent-soft:#e2e8f0; --accent-ink:#334155; }
 
+/* ===== الوضع الليلي ===== */
+html[data-theme="dark"] {
+  --bg: #0f172a; --surface: #1e293b; --text: #e2e8f0; --muted: #94a3b8; --border: #334155;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 28px -12px rgba(0,0,0,.5);
+}
+html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea { background: #0f172a; color: #e2e8f0; }
+html[data-theme="dark"] thead th { background: #0f172a; }
+html[data-theme="dark"] tbody tr:hover { background: #243049; }
+html[data-theme="dark"] tfoot td { background: #0f172a; }
+html[data-theme="dark"] .tab { background: #1e293b; color: #e2e8f0; }
+
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
 body { font-family: 'Tajawal', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
