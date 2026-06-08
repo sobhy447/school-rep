@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from './api.js'
+import { SkeletonCards, SkelBar } from './Skeleton.jsx'
 
 const MONTHS = ['ينا', 'فبر', 'مار', 'أبر', 'ماي', 'يون', 'يول', 'أغس', 'سبت', 'أكت', 'نوف', 'ديس']
 
@@ -42,7 +43,15 @@ export default function Dashboard() {
   }, [])
 
   if (err) return <p className="err">{err}</p>
-  if (!d) return <p className="muted">جارٍ التحميل…</p>
+  if (!d) return (
+    <div>
+      <SkeletonCards count={7} />
+      <div className="card" style={{ marginTop: 16 }}>
+        <SkelBar w="45%" h={16} style={{ marginBottom: 18 }} />
+        <SkelBar w="100%" h={200} />
+      </div>
+    </div>
+  )
 
   const fmt = (v) => Number(v).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
   const cards = [

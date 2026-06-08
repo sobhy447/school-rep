@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from './api.js'
+import { SkeletonTable } from './Skeleton.jsx'
 
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
 const today = () => new Date().toISOString().slice(0, 10)
@@ -9,12 +10,13 @@ export default function FixedAssets() {
   const [form, setForm] = useState({ method: 'STRAIGHT_LINE', acquisition_date: today(), salvage_value: 0 })
   const [period, setPeriod] = useState(today())
   const [msg, setMsg] = useState(null); const [err, setErr] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const reload = async () => {
     const [a, ac, y] = await Promise.all([api.get('/fixed-assets'), api.get('/accounts'), api.get('/settings/fiscal-years')])
     setAssets(a.data.data); setAccounts(ac.data.data.filter((x) => x.is_leaf)); setYears(y.data.data)
   }
-  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')) }, [])
+  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')).finally(() => setLoading(false)) }, [])
   const fyId = () => years[0]?.id
 
   const save = async (e) => {
@@ -67,6 +69,7 @@ export default function FixedAssets() {
           <input type="date" value={period} onChange={(e) => setPeriod(e.target.value)} />
           <button className="btn-primary" onClick={depreciateAll}>تشغيل إهلاك كل الأصول</button>
         </div>
+        {loading ? <SkeletonTable cols={8} rows={5} /> : (
         <table>
           <thead><tr><th>الرمز</th><th>الاسم</th><th>التكلفة</th><th>مجمع الإهلاك</th><th>القيمة الدفترية</th><th>الطريقة</th><th>الحالة</th><th>إجراءات</th></tr></thead>
           <tbody>
@@ -81,6 +84,7 @@ export default function FixedAssets() {
             {assets.length === 0 && <tr><td colSpan={8} className="muted">لا توجد أصول</td></tr>}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   )

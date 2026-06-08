@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api, { openPdf } from './api.js'
 import AttachmentsModal from './AttachmentsModal.jsx'
+import { SkeletonTable } from './Skeleton.jsx'
 
 const emptyLine = () => ({ account_id: '', amount: '', cost_center_id: '', cost_center_extra_id: '' })
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
@@ -13,6 +14,7 @@ export default function Vouchers() {
   const [head, setHead] = useState({ entry_date: new Date().toISOString().slice(0, 10), party_name: '', description: '' })
   const [main, setMain] = useState({ account_id: '', amount: '' }); const [lines, setLines] = useState([emptyLine()])
   const [msg, setMsg] = useState(null); const [err, setErr] = useState(null); const [attachEntry, setAttachEntry] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const reload = async () => {
     const [y, a, c, v] = await Promise.all([api.get('/settings/fiscal-years'), api.get('/accounts'), api.get('/settings/cost-centers'), api.get('/vouchers')])
@@ -20,7 +22,7 @@ export default function Vouchers() {
     const leaves = a.data.data.filter((x) => x.is_leaf); setAccounts(leaves); setCashAccounts(leaves.filter((x) => x.is_cash_or_bank)); setCostCenters(c.data.data)
     if (y.data.data[0]) setHead((h) => ({ ...h, fiscal_year_id: h.fiscal_year_id || y.data.data[0].id }))
   }
-  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')) }, [])
+  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')).finally(() => setLoading(false)) }, [])
 
   const mainLabel = type === 'RECEIPT' ? 'المقبوض في (نقدية/بنك) — مدين' : 'المصروف من (نقدية/بنك) — دائن'
   const linesTotal = lines.reduce((s, l) => s + Number(l.amount || 0), 0)
@@ -92,6 +94,7 @@ export default function Vouchers() {
 
       <div className="card">
         <h4>السندات الأخيرة</h4>
+        {loading ? <SkeletonTable cols={7} rows={5} /> : (
         <table>
           <thead><tr><th>الرقم</th><th>النوع</th><th>التاريخ</th><th>الطرف</th><th>المبلغ</th><th>الحالة</th><th>مرفقات</th></tr></thead>
           <tbody>
@@ -101,6 +104,7 @@ export default function Vouchers() {
             {list.length === 0 && <tr><td colSpan={7} className="muted">لا توجد سندات</td></tr>}
           </tbody>
         </table>
+        )}
       </div>
       {attachEntry && <AttachmentsModal entryId={attachEntry} onClose={() => setAttachEntry(null)} />}
     </div>

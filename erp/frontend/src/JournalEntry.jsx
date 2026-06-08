@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import api, { openPdf } from './api.js'
 import AttachmentsModal from './AttachmentsModal.jsx'
+import { SkeletonTable } from './Skeleton.jsx'
 
 const emptyLine = () => ({ account_id: '', debit: '', credit: '', cost_center_id: '', cost_center_extra_id: '', reference_number: '', description: '', counterparty_name: '' })
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
@@ -14,6 +15,7 @@ export default function JournalEntry() {
   const [lines, setLines] = useState([emptyLine(), emptyLine()])
   const [msg, setMsg] = useState(null); const [err, setErr] = useState(null)
   const [attachEntry, setAttachEntry] = useState(null)
+  const [loading, setLoading] = useState(true)
   const lineRefs = useRef([])
 
   const reload = async () => {
@@ -24,7 +26,7 @@ export default function JournalEntry() {
     setAccounts(a.data.data.filter((x) => x.is_leaf)); setCostCenters(c.data.data)
     if (y.data.data[0]) setHeader((h) => ({ ...h, fiscal_year_id: h.fiscal_year_id || y.data.data[0].id }))
   }
-  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')) }, [])
+  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')).finally(() => setLoading(false)) }, [])
 
   const totalDebit = lines.reduce((s, l) => s + Number(l.debit || 0), 0)
   const totalCredit = lines.reduce((s, l) => s + Number(l.credit || 0), 0)
@@ -99,6 +101,7 @@ export default function JournalEntry() {
 
       <div className="card">
         <h4>القيود الأخيرة</h4>
+        {loading ? <SkeletonTable cols={6} rows={5} /> : (
         <table>
           <thead><tr><th>الرقم</th><th>التاريخ</th><th>البيان</th><th>مدين</th><th>الحالة</th><th>إجراءات</th></tr></thead>
           <tbody>
@@ -118,6 +121,7 @@ export default function JournalEntry() {
             {list.length === 0 && <tr><td colSpan={6} className="muted">لا توجد قيود</td></tr>}
           </tbody>
         </table>
+        )}
       </div>
       {attachEntry && <AttachmentsModal entryId={attachEntry} onClose={() => setAttachEntry(null)} />}
     </div>

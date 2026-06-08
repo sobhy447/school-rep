@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from './api.js'
+import { SkeletonTable } from './Skeleton.jsx'
 
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
 const today = () => new Date().toISOString().slice(0, 10)
@@ -10,13 +11,14 @@ export default function Cheques() {
   const [list, setList] = useState([]); const [parties, setParties] = useState([]); const [banks, setBanks] = useState([]); const [years, setYears] = useState([])
   const [form, setForm] = useState({ type: 'INCOMING', issue_date: today(), due_date: today() })
   const [msg, setMsg] = useState(null); const [err, setErr] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const reload = async () => {
     const [c, p, a, y] = await Promise.all([api.get('/cheques'), api.get('/accounts/parties'), api.get('/accounts'), api.get('/settings/fiscal-years')])
     setList(c.data.data); setParties(p.data.data); setBanks(a.data.data.filter((x) => x.is_leaf && x.is_cash_or_bank)); setYears(y.data.data)
     setForm((f) => ({ ...f, fiscal_year_id: f.fiscal_year_id || y.data.data[0]?.id }))
   }
-  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')) }, [])
+  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')).finally(() => setLoading(false)) }, [])
   const wrap = async (fn) => { setErr(null); setMsg(null); try { await fn(); reload() } catch (e) { setErr(e.response?.data?.message || 'خطأ') } }
 
   return (
@@ -41,6 +43,7 @@ export default function Cheques() {
       </div>
 
       <div className="card">
+        {loading ? <SkeletonTable cols={6} rows={5} /> : (
         <table>
           <thead><tr><th>النوع</th><th>الرقم</th><th>المبلغ</th><th>الاستحقاق</th><th>الحالة</th><th>إجراءات</th></tr></thead>
           <tbody>
@@ -57,6 +60,7 @@ export default function Cheques() {
             {list.length === 0 && <tr><td colSpan={6} className="muted">لا توجد شيكات</td></tr>}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   )

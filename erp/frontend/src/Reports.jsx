@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from './api.js'
+import { SkeletonTable } from './Skeleton.jsx'
 
 const TABS = [
   ['trial-balance', 'ميزان المراجعة'],
@@ -52,7 +53,7 @@ export default function Reports() {
         {data && tab === 'claims' && <Claims d={data} mode={claimsMode} setMode={setClaimsMode} />}
         {data && tab === 'aging' && <Aging d={data} />}
         {data && tab === 'vat' && <Vat d={data} />}
-        {!data && !err && <p className="muted">جارٍ التحميل…</p>}
+        {!data && !err && <SkeletonTable cols={4} rows={7} />}
       </div>
     </div>
   )

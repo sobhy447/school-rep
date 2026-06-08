@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api, { openPdf } from './api.js'
+import { SkeletonTable } from './Skeleton.jsx'
 
 const TYPES = [
   { v: 'ASSET', ar: 'أصول' }, { v: 'LIABILITY', ar: 'خصوم' }, { v: 'EQUITY', ar: 'حقوق ملكية' },
@@ -33,6 +34,7 @@ export default function Accounts() {
   const [flat, setFlat] = useState([])
   const [form, setForm] = useState({ type: 'ASSET', opening_balance_type: 'DEBIT' })
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const load = async () => {
     setError(null)
@@ -40,6 +42,7 @@ export default function Accounts() {
       const [t, f] = await Promise.all([api.get('/accounts/tree'), api.get('/accounts')])
       setTree(t.data.data); setFlat(f.data.data)
     } catch (e) { setError(e.response?.data?.message || 'تعذّر التحميل') }
+    finally { setLoading(false) }
   }
   useEffect(() => { load() }, [])
 
@@ -75,6 +78,7 @@ export default function Accounts() {
       </div>
 
       <div className="card">
+        {loading ? <SkeletonTable cols={6} rows={6} /> : (
         <table>
           <thead><tr><th>الحساب</th><th>النوع</th><th>الطبيعة</th><th>يظهر في</th><th style={{ textAlign: 'end' }}>الرصيد</th><th>كشف</th></tr></thead>
           <tbody>
@@ -82,6 +86,7 @@ export default function Accounts() {
             {tree.length === 0 && <tr><td colSpan={6} className="muted">لا توجد حسابات</td></tr>}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   )

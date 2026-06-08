@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from './api.js'
+import { SkeletonTable } from './Skeleton.jsx'
 
 const n = (v) => Number(v ?? 0).toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })
 const today = () => new Date().toISOString().slice(0, 10)
@@ -10,13 +11,14 @@ export default function Inventory() {
   const [itemForm, setItemForm] = useState({}); const [whForm, setWhForm] = useState({})
   const [op, setOp] = useState({ type: 'receive', movement_date: today() })
   const [msg, setMsg] = useState(null); const [err, setErr] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const reload = async () => {
     const [it, wh] = await Promise.all([api.get('/items'), api.get('/warehouses')])
     setItems(it.data.data); setWarehouses(wh.data.data)
     if (tab === 'valuation') setValuation((await api.get('/stock/valuation')).data.data)
   }
-  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')) }, [tab])
+  useEffect(() => { reload().catch(() => setErr('تعذّر التحميل')).finally(() => setLoading(false)) }, [tab])
 
   const wrap = async (fn) => { setErr(null); setMsg(null); try { await fn(); reload() } catch (e) { setErr(e.response?.data?.message || 'خطأ') } }
   const addItem = (e) => { e.preventDefault(); wrap(async () => { await api.post('/items', itemForm); setItemForm({}); setMsg('تم حفظ الصنف') }) }
@@ -54,11 +56,11 @@ export default function Inventory() {
               <button className="btn-success" type="submit">+ إضافة</button>
             </form>
           </div>
-          <div className="card"><table>
+          <div className="card">{loading ? <SkeletonTable cols={5} rows={5} /> : <table>
             <thead><tr><th>الرمز</th><th>الاسم</th><th>الوحدة</th><th>متوسط التكلفة</th><th>سعر البيع</th></tr></thead>
             <tbody>{items.map((i) => <tr key={i.id}><td>{i.code}</td><td>{i.name}</td><td>{i.unit}</td><td>{n(i.average_cost)}</td><td>{n(i.sale_price)}</td></tr>)}
               {items.length === 0 && <tr><td colSpan={5} className="muted">لا توجد أصناف</td></tr>}</tbody>
-          </table></div>
+          </table>}</div>
         </>
       )}
 
