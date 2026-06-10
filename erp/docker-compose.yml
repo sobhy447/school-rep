@@ -11,7 +11,9 @@ services:
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
       interval: 5s
-      retries: 10
+      timeout: 5s
+      retries: 20
+      start_period: 30s
 
   api:
     build: ./backend
@@ -27,8 +29,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # ينتظر حتى تصبح قاعدة البيانات جاهزة فعلاً ثم يهيّئ الجداول والبيانات
     command: >
-      sh -c "php artisan migrate --force --seed &&
+      sh -c "until php artisan migrate --force --seed; do
+               echo 'قاعدة البيانات لم تجهز بعد — إعادة المحاولة خلال 3 ثوانٍ...';
+               sleep 3;
+             done &&
              php artisan serve --host=0.0.0.0 --port=8000"
 
   web:
