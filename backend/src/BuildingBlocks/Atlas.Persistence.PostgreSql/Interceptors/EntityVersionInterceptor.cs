@@ -1,4 +1,4 @@
-using Atlas.Persistence.PostgreSql.Abstractions;
+using Atlas.SharedKernel.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;

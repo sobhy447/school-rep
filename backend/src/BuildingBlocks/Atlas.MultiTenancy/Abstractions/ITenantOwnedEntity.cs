@@ -1,4 +1,4 @@
-namespace Atlas.Persistence.PostgreSql.Abstractions;
+namespace Atlas.MultiTenancy.Abstractions;
 
 public interface ITenantOwnedEntity
 {

@@ -1,4 +1,4 @@
-namespace Atlas.Persistence.PostgreSql.Abstractions;
+namespace Atlas.SharedKernel.Abstractions;
 
 public interface IAuditableEntity
 {

@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Atlas.Persistence.PostgreSql.Abstractions;
+using Atlas.SharedKernel.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Atlas.Persistence.PostgreSql.Query;

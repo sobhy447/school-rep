@@ -1,4 +1,5 @@
-using Atlas.Persistence.PostgreSql.Abstractions;
+using Atlas.MultiTenancy.Abstractions;
+using Atlas.SharedKernel.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
