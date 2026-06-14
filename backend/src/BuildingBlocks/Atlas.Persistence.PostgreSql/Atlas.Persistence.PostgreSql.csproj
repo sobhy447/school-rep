@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Persistence.PostgreSql</RootNamespace>
+    <AssemblyName>Atlas.Persistence.PostgreSql</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+    <ProjectReference Include="..\Atlas.BuildingBlocks.Domain\Atlas.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\Atlas.MultiTenancy\Atlas.MultiTenancy.csproj" />
+    <ProjectReference Include="..\Atlas.Messaging.Outbox\Atlas.Messaging.Outbox.csproj" />
+  </ItemGroup>
+
+</Project>
