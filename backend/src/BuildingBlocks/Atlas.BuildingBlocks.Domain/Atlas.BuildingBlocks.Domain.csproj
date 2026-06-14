@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.BuildingBlocks.Domain</RootNamespace>
+    <AssemblyName>Atlas.BuildingBlocks.Domain</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

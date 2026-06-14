@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.SharedKernel</RootNamespace>
+    <AssemblyName>Atlas.SharedKernel</AssemblyName>
+  </PropertyGroup>
+
+</Project>

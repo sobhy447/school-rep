@@ -1,0 +1,17 @@
+# .NET build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+project.lock.json
+artifacts/
+
+# Rider / VS
+.idea/
+.vs/
+
+# NuGet
+*.nupkg
+packages/
+.packages/
