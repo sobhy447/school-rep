@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Modules.Identity.Infrastructure</RootNamespace>
+    <AssemblyName>Atlas.Modules.Identity.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="BCrypt.Net-Next" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.BuildingBlocks.Domain\Atlas.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.MultiTenancy\Atlas.MultiTenancy.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.Persistence.PostgreSql\Atlas.Persistence.PostgreSql.csproj" />
+    <ProjectReference Include="..\Atlas.Modules.Identity.Domain\Atlas.Modules.Identity.Domain.csproj" />
+    <ProjectReference Include="..\Atlas.Modules.Identity.Application\Atlas.Modules.Identity.Application.csproj" />
+  </ItemGroup>
+
+</Project>

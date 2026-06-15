@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Modules.Identity.Application</RootNamespace>
+    <AssemblyName>Atlas.Modules.Identity.Application</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.BuildingBlocks.Domain\Atlas.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.BuildingBlocks.Application\Atlas.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.MultiTenancy\Atlas.MultiTenancy.csproj" />
+    <ProjectReference Include="..\Atlas.Modules.Identity.Domain\Atlas.Modules.Identity.Domain.csproj" />
+    <ProjectReference Include="..\Atlas.Modules.Identity.Contracts\Atlas.Modules.Identity.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
