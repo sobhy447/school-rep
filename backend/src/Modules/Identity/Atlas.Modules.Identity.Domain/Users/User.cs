@@ -86,7 +86,7 @@ public sealed class User : AggregateRoot<long>, IAuditableEntity, ISoftDeletable
         ArgumentNullException.ThrowIfNull(passwordHash);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(createdBy);
 
-        if (employeeId is <= 0)
+        if (employeeId.HasValue && employeeId.Value <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(employeeId), employeeId, "EmployeeId must be positive when provided.");
         }

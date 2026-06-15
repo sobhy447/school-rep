@@ -36,7 +36,7 @@ public sealed class UserRole : AggregateRoot<long>, ITenantOwnedEntity
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(roleId);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(assignedBy);
 
-        if (companyId is <= 0)
+        if (companyId.HasValue && companyId.Value <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(companyId), companyId, "CompanyId must be positive when provided.");
         }

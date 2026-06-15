@@ -56,7 +56,7 @@ public sealed class Role : AggregateRoot<long>, IAuditableEntity, ISoftDeletable
             throw new ArgumentException("A non-system role must be scoped to a tenant.", nameof(tenantId));
         }
 
-        if (tenantId is <= 0)
+        if (tenantId.HasValue && tenantId.Value <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(tenantId), tenantId, "TenantId must be positive when provided.");
         }
