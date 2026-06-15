@@ -60,6 +60,7 @@ public sealed class CreateBranchCommandHandler(
         LocalizedName name = LocalizedName.Create(command.NameAr, command.NameEn);
 
         Branch branch = Branch.Create(
+            tenantId,
             command.CompanyId,
             command.BranchCode,
             name,
@@ -67,9 +68,6 @@ public sealed class CreateBranchCommandHandler(
             command.Phone,
             command.IsMainBranch,
             command.PerformedBy);
-
-        branch.SetTenant(tenantId);
-        branch.RegisterCreatedEvent();
 
         await branches.AddAsync(branch, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

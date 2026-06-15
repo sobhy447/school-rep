@@ -63,6 +63,7 @@ public sealed class Company : AggregateRoot<long>, IAuditableEntity, ISoftDeleta
     public long? UpdatedBy { get; private set; }
 
     public static Company Create(
+        long tenantId,
         string companyCode,
         LocalizedName name,
         long baseCurrencyId,
@@ -75,6 +76,7 @@ public sealed class Company : AggregateRoot<long>, IAuditableEntity, ISoftDeleta
         string? logoUrl,
         long createdBy)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(tenantId);
         ArgumentException.ThrowIfNullOrWhiteSpace(companyCode);
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(address);
@@ -85,6 +87,7 @@ public sealed class Company : AggregateRoot<long>, IAuditableEntity, ISoftDeleta
 
         var company = new Company
         {
+            TenantId = tenantId,
             CompanyCode = companyCode.Trim(),
             Name = name,
             BaseCurrencyId = baseCurrencyId,
@@ -101,11 +104,9 @@ public sealed class Company : AggregateRoot<long>, IAuditableEntity, ISoftDeleta
             CreatedBy = createdBy
         };
 
+        company.RaiseDomainEvent(new CompanyCreatedDomainEvent(company.TenantId, company.CompanyCode));
         return company;
     }
-
-    public void RegisterCreatedEvent() =>
-        RaiseDomainEvent(new CompanyCreatedDomainEvent(TenantId, CompanyCode));
 
     public void UpdateProfile(
         LocalizedName name,
@@ -137,23 +138,17 @@ public sealed class Company : AggregateRoot<long>, IAuditableEntity, ISoftDeleta
         UpdatedBy = updatedBy;
     }
 
-    public void SetTenant(long tenantId)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(tenantId);
-        TenantId = tenantId;
-    }
-
     public void AdvanceVersion() => EntityVersion += 1;
-
-    public void SetCreated(DateTime timestampUtc) => CreatedAtUtc = timestampUtc;
-
-    public void SetModified(DateTime timestampUtc) => UpdatedAtUtc = timestampUtc;
 
     public void MarkDeleted(DateTime timestampUtc)
     {
         IsDeleted = true;
         DeletedAtUtc = timestampUtc;
     }
+
+    void IAuditableEntity.SetCreated(DateTime timestampUtc) => CreatedAtUtc = timestampUtc;
+
+    void IAuditableEntity.SetModified(DateTime timestampUtc) => UpdatedAtUtc = timestampUtc;
 
     private static string? Normalize(string? value, int maxLength)
     {

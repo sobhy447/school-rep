@@ -83,6 +83,7 @@ public sealed class CreateCompanyCommandHandler(
         Address address = Address.Create(command.AddressLine1, command.AddressLine2, command.City, command.CountryCode);
 
         Company company = Company.Create(
+            tenantId,
             command.CompanyCode,
             name,
             command.BaseCurrencyId,
@@ -94,9 +95,6 @@ public sealed class CreateCompanyCommandHandler(
             command.Email,
             command.LogoUrl,
             command.PerformedBy);
-
-        company.SetTenant(tenantId);
-        company.RegisterCreatedEvent();
 
         await companies.AddAsync(company, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

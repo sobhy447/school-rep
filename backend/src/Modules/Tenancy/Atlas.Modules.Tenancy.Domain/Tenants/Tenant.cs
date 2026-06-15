@@ -89,7 +89,7 @@ public sealed class Tenant : AggregateRoot<long>, IAuditableEntity, ISoftDeletab
             CreatedBy = createdBy
         };
 
-        tenant.RaiseDomainEvent(new TenantCreatedDomainEvent(tenant.TenantCode));
+        tenant.RaiseDomainEvent(new TenantCreatedDomainEvent(tenant.Id, tenant.TenantCode));
         return tenant;
     }
 
@@ -140,9 +140,9 @@ public sealed class Tenant : AggregateRoot<long>, IAuditableEntity, ISoftDeletab
         Touch(updatedBy);
     }
 
-    public void SetCreated(DateTime timestampUtc) => CreatedAtUtc = timestampUtc;
+    void IAuditableEntity.SetCreated(DateTime timestampUtc) => CreatedAtUtc = timestampUtc;
 
-    public void SetModified(DateTime timestampUtc) => UpdatedAtUtc = timestampUtc;
+    void IAuditableEntity.SetModified(DateTime timestampUtc) => UpdatedAtUtc = timestampUtc;
 
     public void MarkDeleted(DateTime timestampUtc)
     {

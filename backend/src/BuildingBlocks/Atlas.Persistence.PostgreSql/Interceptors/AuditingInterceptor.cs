@@ -1,4 +1,3 @@
-using Atlas.MultiTenancy.Abstractions;
 using Atlas.SharedKernel.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -6,8 +5,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Atlas.Persistence.PostgreSql.Interceptors;
 
-public sealed class AuditingInterceptor(ITenantContext tenantContext, TimeProvider timeProvider)
-    : SaveChangesInterceptor
+public sealed class AuditingInterceptor(TimeProvider timeProvider) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
@@ -34,27 +32,17 @@ public sealed class AuditingInterceptor(ITenantContext tenantContext, TimeProvid
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private void Apply(DbContext context, DateTime utcNow)
+    private static void Apply(DbContext context, DateTime utcNow)
     {
-        foreach (EntityEntry entry in context.ChangeTracker.Entries())
+        foreach (EntityEntry<IAuditableEntity> entry in context.ChangeTracker.Entries<IAuditableEntity>())
         {
-            if (entry.State == EntityState.Added && entry.Entity is ITenantOwnedEntity tenantOwned)
-            {
-                tenantOwned.SetTenant(tenantContext.TenantId);
-            }
-
-            if (entry.Entity is not IAuditableEntity auditable)
-            {
-                continue;
-            }
-
             switch (entry.State)
             {
                 case EntityState.Added:
-                    auditable.SetCreated(utcNow);
+                    entry.Entity.SetCreated(utcNow);
                     break;
                 case EntityState.Modified:
-                    auditable.SetModified(utcNow);
+                    entry.Entity.SetModified(utcNow);
                     break;
             }
         }
