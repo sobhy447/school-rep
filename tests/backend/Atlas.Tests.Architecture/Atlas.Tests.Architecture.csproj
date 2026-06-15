@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Tests.Architecture</RootNamespace>
+    <AssemblyName>Atlas.Tests.Architecture</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NetArchTest.Rules" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\backend\src\BuildingBlocks\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\backend\src\BuildingBlocks\Atlas.BuildingBlocks.Domain\Atlas.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\backend\src\BuildingBlocks\Atlas.BuildingBlocks.Application\Atlas.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\backend\src\BuildingBlocks\Atlas.MultiTenancy\Atlas.MultiTenancy.csproj" />
+    <ProjectReference Include="..\..\backend\src\BuildingBlocks\Atlas.Persistence.PostgreSql\Atlas.Persistence.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\backend\src\BuildingBlocks\Atlas.Caching.Redis\Atlas.Caching.Redis.csproj" />
+    <ProjectReference Include="..\..\backend\src\BuildingBlocks\Atlas.Messaging.Outbox\Atlas.Messaging.Outbox.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Tenancy\Atlas.Modules.Tenancy.Domain\Atlas.Modules.Tenancy.Domain.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Tenancy\Atlas.Modules.Tenancy.Application\Atlas.Modules.Tenancy.Application.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Tenancy\Atlas.Modules.Tenancy.Contracts\Atlas.Modules.Tenancy.Contracts.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Tenancy\Atlas.Modules.Tenancy.Infrastructure\Atlas.Modules.Tenancy.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Identity\Atlas.Modules.Identity.Domain\Atlas.Modules.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Identity\Atlas.Modules.Identity.Application\Atlas.Modules.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Identity\Atlas.Modules.Identity.Contracts\Atlas.Modules.Identity.Contracts.csproj" />
+    <ProjectReference Include="..\..\backend\src\Modules\Identity\Atlas.Modules.Identity.Infrastructure\Atlas.Modules.Identity.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
