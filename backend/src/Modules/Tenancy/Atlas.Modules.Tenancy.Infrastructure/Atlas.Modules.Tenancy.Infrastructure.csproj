@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Modules.Tenancy.Infrastructure</RootNamespace>
+    <AssemblyName>Atlas.Modules.Tenancy.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.BuildingBlocks.Domain\Atlas.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.MultiTenancy\Atlas.MultiTenancy.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.Persistence.PostgreSql\Atlas.Persistence.PostgreSql.csproj" />
+    <ProjectReference Include="..\Atlas.Modules.Tenancy.Domain\Atlas.Modules.Tenancy.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

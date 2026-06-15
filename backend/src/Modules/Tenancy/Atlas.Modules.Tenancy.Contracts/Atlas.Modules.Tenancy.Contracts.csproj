@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Modules.Tenancy.Contracts</RootNamespace>
+    <AssemblyName>Atlas.Modules.Tenancy.Contracts</AssemblyName>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Modules.Tenancy.Endpoints</RootNamespace>
+    <AssemblyName>Atlas.Modules.Tenancy.Endpoints</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+    <ProjectReference Include="..\Atlas.Modules.Tenancy.Application\Atlas.Modules.Tenancy.Application.csproj" />
+    <ProjectReference Include="..\Atlas.Modules.Tenancy.Contracts\Atlas.Modules.Tenancy.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

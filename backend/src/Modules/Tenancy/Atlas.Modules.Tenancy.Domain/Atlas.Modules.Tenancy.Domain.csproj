@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Atlas.Modules.Tenancy.Domain</RootNamespace>
+    <AssemblyName>Atlas.Modules.Tenancy.Domain</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.SharedKernel\Atlas.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.BuildingBlocks.Domain\Atlas.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Atlas.MultiTenancy\Atlas.MultiTenancy.csproj" />
+  </ItemGroup>
+
+</Project>
